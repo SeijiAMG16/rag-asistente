@@ -1,112 +1,246 @@
-# 📚 Asistente RAG Local (FastAPI + Streamlit + ChromaDB + Google Drive)
+# 📚 Asistente RAG Local (Django + React + ChromaDB + Google Drive + MySQL)
 
-Asistente conversacional local para consultar tus propios documentos, combinando búsqueda semántica y modelos LLM ligeros, con opción de ingestión directa desde Google Drive.
-
-1. sync_drive.py
-2. extract_text.py
-3. ingest.py
-4. query.py (prueba del 3)
-5. api.py
+Asistente conversacional local para consultar tus propios documentos PDF desde Google Drive, combinando búsqueda semántica con RAG (Retrieval-Augmented Generation) y una interfaz web moderna.
 
 ---
 
 ## 🚀 Características
 
-- Recuperación inteligente de fragmentos relevantes de tus propios documentos.
-- Soporte para ingestión de archivos `.txt` locales y extracción directa desde Google Drive (`.pdf`, `.docx`, etc.).
-- Respuestas generadas con modelos LLM locales (sin depender de servicios pagos ni la nube).
-- Interfaz web moderna, fácil de usar (Streamlit).
-- Todo el procesamiento y almacenamiento se realiza localmente, sin enviar información sensible a terceros.
+- **Backend Django**: API REST robusta con autenticación JWT
+- **Frontend React**: Interfaz moderna y responsiva
+- **Base de datos MySQL**: Almacenamiento confiable de conversaciones y metadatos
+- **ChromaDB**: Base de datos vectorial para búsqueda semántica
+- **Google Drive Integration**: Sincronización automática de PDFs
+- **RAG Local**: Procesamiento 100% local, sin APIs externas
+- **Autenticación**: Sistema completo de login/registro
 
 ---
 
-## 🖥️ Requisitos
+## 🖥️ Requisitos Previos
+
+Antes de instalar, asegúrate de tener:
 
 - **Python 3.9+** (recomendado 3.10+)
-- Recomendado: **tarjeta GPU** para mejor rendimiento con LLM (opcional)
-- Acceso a Google Drive (para ingestión automática)
-- Modelos se descargan automáticamente en primera ejecución
+- **Node.js 16+** y **npm**
+- **MySQL Server** (versión 5.7+ o 8.0+)
+- **Git**
+- Cuenta de **Google Drive** y credenciales de servicio
 
 ---
 
-## 🛠️ Instalación
+## 🛠️ Instalación Completa
 
-1. **Clona este repositorio**  
+### **Paso 1: Clonar el Repositorio**
 
+```bash
+git clone https://github.com/SeijiAMG16/rag-asistente.git
+cd rag-asistente
+```
+
+### **Paso 2: Configurar MySQL**
+
+1. **Instalar MySQL** (si no está instalado):
+   - Windows: Descargar desde [mysql.com](https://dev.mysql.com/downloads/mysql/)
+   - Ubuntu/Debian: `sudo apt install mysql-server`
+   - macOS: `brew install mysql`
+
+2. **Iniciar el servicio MySQL**:
+   - Windows: El servicio se inicia automáticamente
+   - Linux/macOS: `sudo systemctl start mysql` o `brew services start mysql`
+
+3. **Verificar conexión**:
    ```bash
-   git clone https://github.com/HugoX2003/rag-asistente
-   cd rag-asistente
+   mysql -u root -p
    ```
 
-2. **Crea y activa un entorno virtual**
+### **Paso 3: Configurar Google Drive API**
 
-    ```bash
-    python -m venv venv
-    # En Windows
-    venv\Scripts\activate
-    # En Linux/macOS
-    source venv/bin/activate
-    ```
+1. **Crear proyecto en Google Cloud Console**:
+   - Ir a [Google Cloud Console](https://console.cloud.google.com/)
+   - Crear nuevo proyecto o seleccionar uno existente
 
-3. **Instala las dependencias**
+2. **Habilitar Google Drive API**:
+   - Buscar "Google Drive API" y habilitarla
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+3. **Crear cuenta de servicio**:
+   - Ir a "Credenciales" → "Crear credenciales" → "Cuenta de servicio"
+   - Descargar el archivo JSON de credenciales
+   - Guardar como `service_account.json` en ubicación conocida
+
+4. **Obtener ID de carpeta de Google Drive**:
+   - Abrir Google Drive en navegador
+   - Navegar a la carpeta con tus PDFs
+   - Copiar el ID de la URL: `https://drive.google.com/drive/folders/[ID_AQUÍ]`
+
+### **Paso 4: Configurar Backend (Django)**
+
+```bash
+# Navegar al directorio backend
+cd backend/scripts
+
+# Crear entorno virtual
+python -m venv .venv
+
+# Activar entorno virtual
+# Windows:
+.\.venv\Scripts\Activate.ps1
+# Linux/macOS:
+source .venv/bin/activate
+
+# Instalar dependencias
+pip install --upgrade pip
+pip install -r ../requirements.txt
+```
+
+### **Paso 5: Configurar Variables de Entorno**
+
+Editar el archivo `backend/scripts/bootstrap_rag.ps1` (Windows) y actualizar estas variables:
+
+```powershell
+# EDITAR ESTAS VARIABLES SEGÚN TU CONFIGURACIÓN
+$DB_ADMIN_USER = "root"                                           # Usuario admin de MySQL
+$DB_ADMIN_PASSWORD = "tu_password_mysql"                         # Password de root MySQL
+$DB_NAME = "rag"                                                 # Nombre de la BD (puedes mantenerlo)
+$DB_USER = "rag_user"                                           # Usuario de la app (puedes mantenerlo)
+$DB_PASSWORD = "strong_password"                                # Password del usuario app
+$DB_HOST = "127.0.0.1"                                         # Host MySQL (local)
+$DB_PORT = "3306"                                              # Puerto MySQL
+
+$SERVICE_ACCOUNT_FILE = "C:\ruta\real\a\tu\service_account.json"  # RUTA REAL al JSON de Google
+$DRIVE_FOLDER_ID = "tu_id_de_carpeta_drive_real"                  # ID REAL de tu carpeta Drive
+```
+
+### **Paso 6: Ejecutar Bootstrap del Backend**
+
+```bash
+# Desde backend/scripts/ con entorno virtual activado
+cd backend/scripts
+.\bootstrap_rag.ps1
+```
+
+Este script automáticamente:
+- ✅ Crea la base de datos MySQL y usuario
+- ✅ Ejecuta migraciones de Django
+- ✅ Sincroniza PDFs desde Google Drive
+- ✅ Procesa y vectoriza los documentos
+- ✅ Inicia el servidor Django en `http://localhost:8000`
+
+### **Paso 7: Configurar Frontend (React)**
+
+En una **nueva terminal**:
+
+```bash
+# Navegar al frontend
+cd frontend-react
+
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo
+npm start
+```
+
+El frontend estará disponible en `http://localhost:3000`
 
 ---
 
-## 🛠️ Instalación
+## 🚀 Uso Diario
 
-### Opción A: Procesar archivos locales `.txt`
+Una vez configurado, para usar la aplicación:
 
-- Coloca tus archivos `.txt` en `data/texts/`
-- Ejecuta el ingestor:
-
-    ```bash
-    python scripts/ingest.py
-    ```
-
-### Opción B: Descargar y extraer desde Google Drive
-
-1. Coloca tu `credentials.json` de Google en la raíz del proyecto.
-2. Ejecuta:
-
-    ```bash
-    python scripts/sync_drive.py
-    ```
-
-- Se abrirá el navegador para autenticarte la primera vez.
-
-3. Los archivos de Google Drive se descargarán y convertirán a `.txt` en `data/texts/`.
-4. Ejecuta luego el ingestor:
-
-    ```bash
-    python scripts/ingest.py
-    ```
-
-## 🚀 Ejecuta la API y la interfaz web
-
-### 1. Inicia la API (en una terminal)
-
+### **Iniciar Backend:**
 ```bash
-    uvicorn scripts.api:app --reload
+cd backend/scripts
+.\.venv\Scripts\Activate.ps1  # Activar entorno virtual
+cd ..
+python manage.py runserver 0.0.0.0:8000
 ```
 
-### 2. Inicia el frontend (en otra terminal)
-
+### **Iniciar Frontend:**
 ```bash
-    streamlit run frontend.py
+cd frontend-react
+npm start
 ```
 
-- Accede a la interfaz web: http://localhost:8501
+### **Sincronizar nuevos PDFs:**
+```bash
+cd backend
+python manage.py sync_drive_full --chunk-size 600 --chunk-overlap 60
+```
 
-- Documentación interactiva de la API: http://localhost:8000/docs
+---
 
-## ✨ Personalización y sugerencias
+## 🔧 Comandos Útiles
 
-- Cambia el modelo LLM en `api.py` según tus recursos.
+### **Gestión de Base de Datos:**
+```bash
+# Crear/resetear base de datos
+python manage.py initdb --admin-user root --admin-password tu_password
 
-- Puedes mejorar la visualización del frontend editando `frontend.py`.
+# Aplicar migraciones
+python manage.py migrate
 
-- El sistema es 100% local, no depende de APIs pagas.
+# Crear superusuario Django
+python manage.py createsuperuser
+```
+
+### **Gestión de Documentos:**
+```bash
+# Sincronización completa desde Drive
+python manage.py sync_drive_full --chunk-size 600 --chunk-overlap 60
+
+# Forzar re-descarga de todos los PDFs
+python manage.py sync_drive_full --force
+```
+
+---
+
+## 🛠️ Solución de Problemas Comunes
+
+### **Error: "Access denied for user 'rag_user'"**
+```bash
+# Recrear usuario de base de datos
+python manage.py initdb --admin-user root --admin-password tu_password_mysql
+```
+
+### **Error: "Authentication credentials were not provided"**
+- El problema se solucionó automáticamente en el código
+
+### **Error: "SERVICE_ACCOUNT_FILE not found"**
+- Verificar que la ruta en `bootstrap_rag.ps1` sea correcta
+- Verificar que el archivo JSON existe y tiene permisos de lectura
+
+### **Frontend no se conecta al Backend**
+- Verificar que el backend esté ejecutándose en `http://localhost:8000`
+- Verificar configuración CORS en Django settings
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+rag-asistente/
+├── backend/                 # API Django
+│   ├── api/                # App principal
+│   ├── core/               # Configuración Django
+│   ├── scripts/            # Scripts de bootstrap
+│   └── manage.py           # Comando Django
+├── frontend-react/         # Interfaz React
+│   ├── src/                # Código fuente React
+│   └── package.json        # Dependencias npm
+├── data/                   # Datos y archivos procesados
+│   ├── pdfs/              # PDFs descargados
+│   └── texts/             # Textos extraídos
+└── chroma_db/             # Base de datos vectorial
+```
+
+---
+
+## 🔒 Seguridad
+
+- Las credenciales se manejan por variables de entorno
+- La autenticación usa JWT tokens
+- Todos los datos se procesan localmente
+- No se envía información a servicios externos (excepto Google Drive para descarga)
+
+---
