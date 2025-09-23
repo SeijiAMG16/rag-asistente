@@ -91,32 +91,45 @@ export default function Register({ onRegister, onBackToLogin }) {
           aria-labelledby="register-title"
         >
           <header className="form-header">
-            {/* Logo simple */}
-            <div className="gpt-logo" aria-hidden="true">
-              <svg viewBox="0 0 64 64" width="40" height="40">
-                <path
-                  d="M32 6c7 0 10 3 14 7s7 7 7 14-3 10-7 14-7 7-14 7-10-3-14-7-7-7-7-14 3-10 7-14 7-7 14-7z"
-                  className="gpt-logo-ring"
+            {/* Logo moderno mejorado */}
+            <div className="gpt-logo register-logo" aria-hidden="true">
+              <svg viewBox="0 0 64 64" width="44" height="44">
+                <circle
+                  cx="32" cy="32" r="22"
+                  fill="none"
+                  stroke="url(#registerGradient)"
+                  strokeWidth="2"
+                  strokeDasharray="4 4"
+                  className="gpt-logo-circle"
                 />
                 <path
-                  d="M19 25c6-10 20-10 26 0M45 39c-6 10-20 10-26 0"
-                  className="gpt-logo-lines"
+                  d="M32 18v28M18 32h28"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  className="gpt-logo-plus"
                 />
+                <defs>
+                  <linearGradient id="registerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="100%" stopColor="#a78bfa" />
+                  </linearGradient>
+                </defs>
               </svg>
             </div>
 
-            <h2 id="register-title" className="title">
-              Crear cuenta
+            <h2 id="register-title" className="title register-title">
+              Crear cuenta nueva
             </h2>
-            <p className="subtitle">Regístrate para comenzar</p>
+            <p className="subtitle">Únete a NISIRA Assistant</p>
           </header>
 
           {/* Campo de nombre de usuario */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon user-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14Z"
+                  d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 4L13.5 7H10.5L9 4L3 7V9H21ZM21 10H3V12H21V10ZM3 13V22H8V16H16V22H21V13H3Z"
                   fill="currentColor"
                 />
               </svg>
@@ -127,10 +140,10 @@ export default function Register({ onRegister, onBackToLogin }) {
             <input
               id="username"
               type="text"
-              placeholder="Nombre de usuario"
+              placeholder="Elige tu nombre de usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="input-field"
+              className="input-field register-input"
               autoComplete="username"
               disabled={loading}
             />
@@ -138,10 +151,10 @@ export default function Register({ onRegister, onBackToLogin }) {
 
           {/* Campo de email */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon email-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M20 6H4a2 2 0 0 0-2 2v.2l10 6.3 10-6.3V8a2 2 0 0 0-2-2Zm0 4.3-9.4 5.9a1 1 0 0 1-1.2 0L4 10.3V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2Z"
+                  d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"
                   fill="currentColor"
                 />
               </svg>
@@ -152,10 +165,10 @@ export default function Register({ onRegister, onBackToLogin }) {
             <input
               id="email"
               type="email"
-              placeholder="Correo electrónico"
+              placeholder="Tu correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="input-field"
+              className="input-field register-input"
               autoComplete="email"
               disabled={loading}
             />
@@ -163,10 +176,10 @@ export default function Register({ onRegister, onBackToLogin }) {
 
           {/* Campo de contraseña */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon password-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M17 9h-1V7a4 4 0 1 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-6 0V7a3 3 0 1 1 6 0v2Z"
+                  d="M18 8H20C21.1 8 22 8.9 22 10V20C22 21.1 21.1 22 20 22H4C2.9 22 2 21.1 2 20V10C2 8.9 2.9 8 4 8H6V6C6 3.8 7.8 2 10 2H14C16.2 2 18 3.8 18 6V8ZM16 8V6C16 4.9 15.1 4 14 4H10C8.9 4 8 4.9 8 6V8H16ZM12 17C13.1 17 14 16.1 14 15C14 13.9 13.1 13 12 13C10.9 13 10 13.9 10 15C10 16.1 10.9 17 12 17Z"
                   fill="currentColor"
                 />
               </svg>
@@ -177,10 +190,10 @@ export default function Register({ onRegister, onBackToLogin }) {
             <input
               id="password"
               type="password"
-              placeholder="Contraseña (mínimo 6 caracteres)"
+              placeholder="Crea una contraseña segura (min. 6 caracteres)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
+              className="input-field register-input"
               autoComplete="new-password"
               disabled={loading}
             />
@@ -188,10 +201,10 @@ export default function Register({ onRegister, onBackToLogin }) {
 
           {/* Campo de confirmación de contraseña */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon confirm-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M17 9h-1V7a4 4 0 1 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-6 0V7a3 3 0 1 1 6 0v2Z"
+                  d="M18 8H20C21.1 8 22 8.9 22 10V20C22 21.1 21.1 22 20 22H4C2.9 22 2 21.1 2 20V10C2 8.9 2.9 8 4 8H6V6C6 3.8 7.8 2 10 2H14C16.2 2 18 3.8 18 6V8ZM16 8V6C16 4.9 15.1 4 14 4H10C8.9 4 8 4.9 8 6V8H16ZM10.5 16.2L16.2 10.5L15.5 9.8L10.5 14.8L8.5 12.8L7.8 13.5L10.5 16.2Z"
                   fill="currentColor"
                 />
               </svg>
@@ -202,23 +215,27 @@ export default function Register({ onRegister, onBackToLogin }) {
             <input
               id="confirmPassword"
               type="password"
-              placeholder="Confirmar contraseña"
+              placeholder="Confirma tu contraseña"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="input-field"
+              className="input-field register-input"
               autoComplete="new-password"
               disabled={loading}
             />
           </div>
 
           {/* Botón de registro */}
-          <button type="submit" disabled={loading} className="btn-primary gpt-btn">
+          <button type="submit" disabled={loading} className="btn-primary gpt-btn register-btn">
             {loading ? (
               <>
-                <span className="loading-spinner" aria-hidden="true"></span> Creando cuenta...
+                <span className="loading-spinner" aria-hidden="true"></span>
+                <span>Creando tu cuenta...</span>
               </>
             ) : (
-              "Crear Cuenta"
+              <>
+                <span className="btn-icon">🚀</span>
+                <span>Crear mi cuenta</span>
+              </>
             )}
           </button>
 
@@ -230,10 +247,11 @@ export default function Register({ onRegister, onBackToLogin }) {
           <button
             type="button"
             onClick={onBackToLogin}
-            className="btn-secondary ghost-btn"
+            className="btn-secondary ghost-btn back-btn"
             disabled={loading}
           >
-            ¿Ya tienes cuenta? Inicia sesión
+            <span className="btn-icon">←</span>
+            <span>¿Ya tienes cuenta? Inicia sesión</span>
           </button>
 
           {/* Mostrar mensajes de error / éxito */}

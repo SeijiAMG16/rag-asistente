@@ -64,32 +64,53 @@ export default function Login({ onLogin, onShowRegister }) {
           aria-labelledby="login-title"
         >
           <header className="form-header">
-            {/* Logo simple inspirado en GPT */}
-            <div className="gpt-logo" aria-hidden="true">
-              <svg viewBox="0 0 64 64" width="40" height="40">
-                <path
-                  d="M32 6c7 0 10 3 14 7s7 7 7 14-3 10-7 14-7 7-14 7-10-3-14-7-7-7-7-14 3-10 7-14 7-7 14-7z"
-                  className="gpt-logo-ring"
+            {/* Logo moderno mejorado para login */}
+            <div className="gpt-logo login-logo" aria-hidden="true">
+              <svg viewBox="0 0 64 64" width="44" height="44">
+                <circle
+                  cx="32" cy="32" r="22"
+                  fill="none"
+                  stroke="url(#loginGradient)"
+                  strokeWidth="2"
+                  className="gpt-logo-orbit"
+                />
+                <circle
+                  cx="32" cy="32" r="8"
+                  fill="url(#loginGradientFill)"
+                  className="gpt-logo-center"
                 />
                 <path
-                  d="M19 25c6-10 20-10 26 0M45 39c-6 10-20 10-26 0"
-                  className="gpt-logo-lines"
+                  d="M32 12v8M32 44v8M12 32h8M44 32h8"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  className="gpt-logo-rays"
                 />
+                <defs>
+                  <linearGradient id="loginGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#22d3ee" />
+                    <stop offset="100%" stopColor="#a78bfa" />
+                  </linearGradient>
+                  <radialGradient id="loginGradientFill" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#a78bfa" stopOpacity="0.6" />
+                  </radialGradient>
+                </defs>
               </svg>
             </div>
 
-            <h2 id="login-title" className="title">
-              Iniciar sesión
+            <h2 id="login-title" className="title login-title">
+              Bienvenido de vuelta
             </h2>
-            <p className="subtitle">Bienvenido de vuelta</p>
+            <p className="subtitle">Accede a NISIRA Assistant</p>
           </header>
 
           {/* Campo de nombre de usuario */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon login-user-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-5 0-9 2.5-9 5.5V22h18v-2.5C21 16.5 17 14 12 14Z"
+                  d="M12 2C14.21 2 16 3.79 16 6C16 8.21 14.21 10 12 10C9.79 10 8 8.21 8 6C8 3.79 9.79 2 12 2ZM12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4ZM4 19V16C4 14.67 4.67 14 6 14H18C19.33 14 20 14.67 20 16V19C20 20.11 19.11 21 18 21H6C4.89 21 4 20.11 4 19Z"
                   fill="currentColor"
                 />
               </svg>
@@ -100,10 +121,10 @@ export default function Login({ onLogin, onShowRegister }) {
             <input
               id="username"
               type="text"
-              placeholder="Nombre de usuario"
+              placeholder="Ingresa tu nombre de usuario"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="input-field"
+              className="input-field login-input"
               autoComplete="username"
               disabled={loading}
             />
@@ -111,10 +132,10 @@ export default function Login({ onLogin, onShowRegister }) {
 
           {/* Campo de contraseña */}
           <div className="input-group">
-            <span className="icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18">
+            <span className="icon login-password-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20">
                 <path
-                  d="M17 9h-1V7a4 4 0 1 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2Zm-6 0V7a3 3 0 1 1 6 0v2Z"
+                  d="M6 10V8C6 5.79 7.79 4 10 4H14C16.21 4 18 5.79 18 8V10H19C20.1 10 21 10.9 21 12V20C21 21.1 20.1 22 19 22H5C3.9 22 3 21.1 3 20V12C3 10.9 3.9 10 5 10H6ZM8 8V10H16V8C16 6.9 15.1 6 14 6H10C8.9 6 8 6.9 8 8ZM12 17C13.1 17 14 16.1 14 15C14 13.9 13.1 13 12 13C10.9 13 10 13.9 10 15C10 16.1 10.9 17 12 17Z"
                   fill="currentColor"
                 />
               </svg>
@@ -125,23 +146,27 @@ export default function Login({ onLogin, onShowRegister }) {
             <input
               id="password"
               type="password"
-              placeholder="Contraseña"
+              placeholder="Ingresa tu contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="input-field"
+              className="input-field login-input"
               autoComplete="current-password"
               disabled={loading}
             />
           </div>
 
           {/* Botón de inicio de sesión */}
-          <button type="submit" disabled={loading} className="btn-primary gpt-btn">
+          <button type="submit" disabled={loading} className="btn-primary gpt-btn login-btn">
             {loading ? (
               <>
-                <span className="loading-spinner" aria-hidden="true"></span> Entrando...
+                <span className="loading-spinner" aria-hidden="true"></span>
+                <span>Iniciando sesión...</span>
               </>
             ) : (
-              "Iniciar Sesión"
+              <>
+                <span className="btn-icon">🔑</span>
+                <span>Iniciar Sesión</span>
+              </>
             )}
           </button>
 
@@ -153,10 +178,11 @@ export default function Login({ onLogin, onShowRegister }) {
           <button
             type="button"
             onClick={onShowRegister}
-            className="btn-secondary ghost-btn"
+            className="btn-secondary ghost-btn register-link-btn"
             disabled={loading}
           >
-            ¿No tienes cuenta? Regístrate
+            <span className="btn-icon">✨</span>
+            <span>¿No tienes cuenta? Regístrate</span>
           </button>
 
           {/* Mostrar mensajes de error */}

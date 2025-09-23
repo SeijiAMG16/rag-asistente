@@ -226,3 +226,409 @@
   color: #bbf7d0;
   font-size: .95rem;
 }
+
+/* ===== MEJORAS ESTÉTICAS PARA REGISTER ===== */
+
+/* Logo especial para registro */
+.login .register-logo {
+  background: linear-gradient(135deg, rgba(34,211,238,0.25), rgba(167,139,250,0.25));
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 
+    inset 0 0 20px rgba(34,211,238,0.2), 
+    inset 0 0 28px rgba(167,139,250,0.15),
+    0 8px 32px rgba(34,211,238,0.15);
+  animation: registerPulse 3s ease-in-out infinite;
+}
+
+@keyframes registerPulse {
+  0%, 100% { 
+    box-shadow: 
+      inset 0 0 20px rgba(34,211,238,0.2), 
+      inset 0 0 28px rgba(167,139,250,0.15),
+      0 8px 32px rgba(34,211,238,0.15);
+  }
+  50% { 
+    box-shadow: 
+      inset 0 0 25px rgba(34,211,238,0.3), 
+      inset 0 0 35px rgba(167,139,250,0.25),
+      0 12px 40px rgba(34,211,238,0.25);
+  }
+}
+
+.login .gpt-logo-circle {
+  animation: rotate 8s linear infinite;
+}
+
+.login .gpt-logo-plus {
+  color: #22d3ee;
+  filter: drop-shadow(0 0 8px rgba(34,211,238,0.5));
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Título especial para registro */
+.login .register-title {
+  background: linear-gradient(135deg, #22d3ee, #a78bfa, #22d3ee);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 4s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Iconos mejorados para cada campo */
+.login .user-icon { color: #60a5fa; }
+.login .email-icon { color: #34d399; }
+.login .password-icon { color: #f59e0b; }
+.login .confirm-icon { color: #10b981; }
+
+.login .user-icon svg,
+.login .email-icon svg,
+.login .password-icon svg,
+.login .confirm-icon svg {
+  filter: drop-shadow(0 0 4px currentColor);
+  transition: all 0.3s ease;
+}
+
+/* Inputs mejorados para registro */
+.login .register-input {
+  transition: all 0.3s ease, transform 0.2s ease;
+}
+
+.login .register-input:focus {
+  transform: translateY(-1px);
+  border-color: rgba(34,211,238,0.8);
+  box-shadow: 
+    0 0 0 4px rgba(34,211,238,0.15),
+    0 8px 16px rgba(34,211,238,0.1);
+  background: rgba(17,24,39,0.9);
+}
+
+/* Botón principal mejorado */
+.login .register-btn {
+  background: linear-gradient(135deg, rgba(34,211,238,0.25), rgba(167,139,250,0.25));
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 
+    0 10px 30px rgba(34,211,238,0.2), 
+    inset 0 0 24px rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.login .register-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.login .register-btn:hover::before {
+  left: 100%;
+}
+
+.login .register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 40px rgba(34,211,238,0.3),
+    inset 0 0 30px rgba(255,255,255,0.1);
+}
+
+/* Botón de regreso mejorado */
+.login .back-btn {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+
+.login .back-btn:hover {
+  background: rgba(255,255,255,0.08);
+  transform: translateX(-3px);
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* Iconos en botones */
+.login .btn-icon {
+  display: inline-block;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
+}
+
+.login .register-btn:hover .btn-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.login .back-btn:hover .btn-icon {
+  transform: translateX(-2px);
+}
+
+/* Animación de entrada para el formulario */
+.login .auth-form.gpt-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Mejora en mensajes de éxito */
+.login .success-message {
+  background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.15));
+  border: 1px solid rgba(34,197,94,0.4);
+  box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+  animation: successSlide 0.5s ease-out;
+}
+
+@keyframes successSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== MEJORAS ESTÉTICAS PARA LOGIN ===== */
+
+/* Logo especial para login */
+.login .login-logo {
+  background: linear-gradient(135deg, rgba(34,211,238,0.2), rgba(167,139,250,0.2));
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: 
+    inset 0 0 20px rgba(34,211,238,0.15), 
+    inset 0 0 28px rgba(167,139,250,0.1),
+    0 8px 32px rgba(167,139,250,0.15);
+  animation: loginGlow 4s ease-in-out infinite;
+}
+
+@keyframes loginGlow {
+  0%, 100% { 
+    box-shadow: 
+      inset 0 0 20px rgba(34,211,238,0.15), 
+      inset 0 0 28px rgba(167,139,250,0.1),
+      0 8px 32px rgba(167,139,250,0.15);
+  }
+  50% { 
+    box-shadow: 
+      inset 0 0 30px rgba(34,211,238,0.25), 
+      inset 0 0 40px rgba(167,139,250,0.2),
+      0 12px 40px rgba(167,139,250,0.25);
+  }
+}
+
+.login .gpt-logo-orbit {
+  animation: orbitSpin 6s linear infinite reverse;
+}
+
+.login .gpt-logo-center {
+  animation: centerPulse 2s ease-in-out infinite;
+}
+
+.login .gpt-logo-rays {
+  color: #a78bfa;
+  filter: drop-shadow(0 0 6px rgba(167,139,250,0.6));
+  animation: raysSpin 8s linear infinite;
+}
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes centerPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+@keyframes raysSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Título especial para login */
+.login .login-title {
+  background: linear-gradient(135deg, #a78bfa, #22d3ee, #a78bfa);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: loginGradientShift 3s ease-in-out infinite;
+  font-size: 1.7rem;
+}
+
+@keyframes loginGradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Iconos específicos para login */
+.login .login-user-icon { 
+  color: #8b5cf6; 
+  transition: all 0.3s ease;
+}
+.login .login-password-icon { 
+  color: #06b6d4; 
+  transition: all 0.3s ease;
+}
+
+.login .login-user-icon svg,
+.login .login-password-icon svg {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.login .input-group:focus-within .login-user-icon,
+.login .input-group:focus-within .login-password-icon {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Inputs mejorados para login */
+.login .login-input {
+  transition: all 0.3s ease, transform 0.2s ease;
+  position: relative;
+}
+
+.login .login-input:focus {
+  transform: translateY(-2px);
+  border-color: rgba(167,139,250,0.8);
+  box-shadow: 
+    0 0 0 4px rgba(167,139,250,0.15),
+    0 8px 16px rgba(167,139,250,0.1);
+  background: rgba(17,24,39,0.95);
+}
+
+.login .login-input:hover:not(:focus) {
+  border-color: rgba(255,255,255,0.2);
+  background: rgba(17,24,39,0.8);
+}
+
+/* Botón principal de login mejorado */
+.login .login-btn {
+  background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(6,182,212,0.25));
+  border: 1px solid rgba(139,92,246,0.3);
+  box-shadow: 
+    0 10px 30px rgba(139,92,246,0.2), 
+    inset 0 0 24px rgba(255,255,255,0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.login .login-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.6s ease;
+}
+
+.login .login-btn:hover::before {
+  left: 100%;
+}
+
+.login .login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 40px rgba(139,92,246,0.3),
+    inset 0 0 30px rgba(255,255,255,0.12);
+  border-color: rgba(139,92,246,0.4);
+}
+
+/* Botón de enlace a registro mejorado */
+.login .register-link-btn {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.3s ease;
+}
+
+.login .register-link-btn:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 12px rgba(34,211,238,0.1);
+}
+
+/* Efectos especiales en iconos de botones para login */
+.login .login-btn .btn-icon {
+  transition: all 0.3s ease;
+}
+
+.login .login-btn:hover .btn-icon {
+  transform: scale(1.15) rotate(-5deg);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.login .register-link-btn .btn-icon {
+  transition: all 0.3s ease;
+}
+
+.login .register-link-btn:hover .btn-icon {
+  transform: scale(1.2) rotate(10deg);
+  filter: drop-shadow(0 0 6px #22d3ee);
+}
+
+/* Animación especial de entrada para login */
+.login .auth-form.gpt-card {
+  animation: loginSlideIn 0.7s ease-out;
+}
+
+@keyframes loginSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Mensaje de error mejorado para login */
+.login .error-message {
+  background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.12));
+  border: 1px solid rgba(239,68,68,0.4);
+  box-shadow: 0 4px 12px rgba(239,68,68,0.15);
+  animation: errorShake 0.5s ease-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* Mejora en el divider para login */
+.login .divider {
+  position: relative;
+}
+
+.login .divider span {
+  background: rgba(11,15,26,0.9);
+  padding: 0 12px;
+  color: #9ca3af;
+  font-weight: 500;
+}

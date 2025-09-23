@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { query as queryApi, syncDrive, uploadPdf, getConversations, getMessages, syncDriveFull } from './api';
+import { query as queryApi, getConversations, getMessages } from './api';
 import './Chat.css';
 
 const Chat = ({ onLogout }) => {
@@ -9,7 +9,6 @@ const Chat = ({ onLogout }) => {
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [actionMsg, setActionMsg] = useState("");
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -142,60 +141,6 @@ const Chat = ({ onLogout }) => {
                     </div>
                   ))}
                 </div>
-
-                <div className="sidebar-actions">
-                  <button
-                    className="action-btn"
-                    onClick={async () => {
-                      setActionMsg('Sincronizando Drive...');
-                      try {
-                        const r = await syncDrive();
-                        setActionMsg(`Descargados: ${(r.downloaded||[]).length}, Omitidos: ${(r.skipped||[]).length}`);
-                      } catch (e) {
-                        setActionMsg('Error al sincronizar Drive');
-                      }
-                    }}
-                  >
-                    Sync Drive
-                  </button>
-
-                  <button
-                    className="action-btn"
-                    onClick={async () => {
-                      setActionMsg('Sync + extraer + ingestar desde Drive...');
-                      try {
-                        const r = await syncDriveFull({ force: false });
-                        const d = (r.downloaded||[]).length, s = (r.skipped||[]).length, i = (r.ingested||[]).length;
-                        setActionMsg(`Descargados:${d} Omitidos:${s} Ingeridos:${i}`);
-                      } catch (e) {
-                        setActionMsg('Error en Sync+Ingest');
-                      }
-                    }}
-                  >
-                    Sync+Ingest Drive
-                  </button>
-
-                  <label className="upload-label">
-                    Subir PDF
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={async (ev) => {
-                        const f = ev.target.files?.[0]; if (!f) return;
-                        setActionMsg('Subiendo/ingestando PDF...');
-                        try {
-                          const r = await uploadPdf(f);
-                          setActionMsg(`Chunks agregados: ${r.chunks_added}`);
-                        } catch (e) {
-                          setActionMsg('Error al subir/ingerir');
-                        }
-                        ev.target.value = '';
-                      }}
-                    />
-                  </label>
-
-                  {actionMsg && <div className="action-msg">{actionMsg}</div>}
-                </div>
               </div>
 
               <div className="sidebar-footer">
@@ -210,14 +155,78 @@ const Chat = ({ onLogout }) => {
         {/* Main Chat Area */}
         <main className="chat-main">
           <header className="chat-header">
-            <h1>Asistente RAG Inteligente</h1>
+            <div className="header-content">
+              <div className="nisira-logo">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                  <defs>
+                    <linearGradient id="flame1" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#FF6B35" />
+                      <stop offset="50%" stopColor="#FF8C42" />
+                      <stop offset="100%" stopColor="#FFA726" />
+                    </linearGradient>
+                    <linearGradient id="flame2" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8BC34A" />
+                      <stop offset="50%" stopColor="#9CCC65" />
+                      <stop offset="100%" stopColor="#AED581" />
+                    </linearGradient>
+                    <linearGradient id="flame3" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#FFD54F" />
+                      <stop offset="50%" stopColor="#FFEB3B" />
+                      <stop offset="100%" stopColor="#FFF176" />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Llama naranja */}
+                  <path d="M20 80 C20 60, 30 40, 45 30 C35 45, 40 65, 50 70 C45 75, 35 85, 20 80 Z" 
+                        fill="url(#flame1)" className="flame flame1" />
+                  
+                  {/* Llama verde */}
+                  <path d="M35 75 C35 55, 45 35, 60 25 C50 40, 55 60, 65 65 C60 70, 50 80, 35 75 Z" 
+                        fill="url(#flame2)" className="flame flame2" />
+                  
+                  {/* Llama amarilla */}
+                  <path d="M50 70 C50 50, 60 30, 75 20 C65 35, 70 55, 80 60 C75 65, 65 75, 50 70 Z" 
+                        fill="url(#flame3)" className="flame flame3" />
+                </svg>
+              </div>
+              <h1>NISIRA ASSISTANT</h1>
+            </div>
           </header>
 
           <section className="messages-container">
             {messages.length === 0 ? (
               <div className="welcome-message">
-                <div className="welcome-icon">🤖</div>
-                <h2>¡Hola! Soy tu asistente para consultar documentación</h2>
+                <div className="welcome-icon nisira-welcome-logo">
+                  <svg viewBox="0 0 100 100" width="80" height="80">
+                    <defs>
+                      <linearGradient id="welcomeFlame1" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#FF6B35" />
+                        <stop offset="50%" stopColor="#FF8C42" />
+                        <stop offset="100%" stopColor="#FFA726" />
+                      </linearGradient>
+                      <linearGradient id="welcomeFlame2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#8BC34A" />
+                        <stop offset="50%" stopColor="#9CCC65" />
+                        <stop offset="100%" stopColor="#AED581" />
+                      </linearGradient>
+                      <linearGradient id="welcomeFlame3" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#FFD54F" />
+                        <stop offset="50%" stopColor="#FFEB3B" />
+                        <stop offset="100%" stopColor="#FFF176" />
+                      </linearGradient>
+                    </defs>
+                    
+                    <path d="M20 80 C20 60, 30 40, 45 30 C35 45, 40 65, 50 70 C45 75, 35 85, 20 80 Z" 
+                          fill="url(#welcomeFlame1)" className="welcome-flame welcome-flame1" />
+                    
+                    <path d="M35 75 C35 55, 45 35, 60 25 C50 40, 55 60, 65 65 C60 70, 50 80, 35 75 Z" 
+                          fill="url(#welcomeFlame2)" className="welcome-flame welcome-flame2" />
+                    
+                    <path d="M50 70 C50 50, 60 30, 75 20 C65 35, 70 55, 80 60 C75 65, 65 75, 50 70 Z" 
+                          fill="url(#welcomeFlame3)" className="welcome-flame welcome-flame3" />
+                  </svg>
+                </div>
+                <h2>¡Hola! Soy NISIRA, tu asistente inteligente</h2>
                 <p>Pregúntame lo que necesites sobre los documentos disponibles</p>
               </div>
             ) : (

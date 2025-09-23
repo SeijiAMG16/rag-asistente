@@ -309,15 +309,108 @@ body:has(.chat) {
   backdrop-filter: blur(12px);
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
+
+.chat .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.chat .nisira-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,107,53,0.1), rgba(255,235,59,0.1));
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 6px;
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+.chat .nisira-logo svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.chat .flame {
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-origin: center bottom;
+}
+
+.chat .flame1 {
+  animation-name: flicker1;
+  animation-delay: 0s;
+}
+
+.chat .flame2 {
+  animation-name: flicker2;
+  animation-delay: 0.3s;
+}
+
+.chat .flame3 {
+  animation-name: flicker3;
+  animation-delay: 0.6s;
+}
+
+@keyframes logoGlow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(255,107,53,0.3), 0 0 20px rgba(255,235,59,0.2);
+  }
+  50% { 
+    box-shadow: 0 0 15px rgba(255,107,53,0.4), 0 0 30px rgba(255,235,59,0.3);
+  }
+}
+
+@keyframes flicker1 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  25% { transform: scale(1.05) rotate(1deg); opacity: 1; }
+  50% { transform: scale(0.98) rotate(-0.5deg); opacity: 0.95; }
+  75% { transform: scale(1.02) rotate(0.5deg); opacity: 0.98; }
+}
+
+@keyframes flicker2 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+  25% { transform: scale(0.97) rotate(-1deg); opacity: 0.9; }
+  50% { transform: scale(1.03) rotate(1deg); opacity: 1; }
+  75% { transform: scale(0.99) rotate(-0.3deg); opacity: 0.92; }
+}
+
+@keyframes flicker3 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  25% { transform: scale(1.04) rotate(0.8deg); opacity: 0.95; }
+  50% { transform: scale(0.96) rotate(-0.8deg); opacity: 0.85; }
+  75% { transform: scale(1.01) rotate(0.3deg); opacity: 1; }
+}
+
 .chat .chat-header h1{
-  font-size: 1.3rem; margin: 0; 
-  letter-spacing: 0.5px; 
-  background: linear-gradient(135deg, #22d3ee, #a78bfa);
+  font-size: 1.4rem; margin: 0; 
+  letter-spacing: 1px; 
+  background: linear-gradient(135deg, #FF6B35, #FFD54F, #8BC34A);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: 700;
-  text-align: center;
+  font-weight: 800;
+  text-transform: uppercase;
+  animation: titleShimmer 3s ease-in-out infinite;
+}
+
+@keyframes titleShimmer {
+  0%, 100% { 
+    background: linear-gradient(135deg, #FF6B35, #FFD54F, #8BC34A);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  50% { 
+    background: linear-gradient(135deg, #8BC34A, #FF6B35, #FFD54F);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
 }
 
 /* ===== Mensajes: columna central ===== */
@@ -391,6 +484,91 @@ body:has(.chat) {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: float 3s ease-in-out infinite;
+}
+
+.chat .nisira-welcome-logo {
+  font-size: unset;
+  background: unset;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, 
+    rgba(255,107,53,0.15), 
+    rgba(255,235,59,0.15), 
+    rgba(139,195,74,0.15)
+  );
+  border: 2px solid rgba(255,255,255,0.1);
+  padding: 10px;
+  margin-bottom: 30px;
+  animation: welcomeLogoFloat 4s ease-in-out infinite;
+  box-shadow: 
+    0 8px 32px rgba(255,107,53,0.2),
+    0 0 40px rgba(255,235,59,0.1);
+}
+
+.chat .nisira-welcome-logo svg {
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+.chat .welcome-flame {
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  transform-origin: center bottom;
+}
+
+.chat .welcome-flame1 {
+  animation-name: welcomeFlicker1;
+  animation-delay: 0s;
+}
+
+.chat .welcome-flame2 {
+  animation-name: welcomeFlicker2;
+  animation-delay: 0.5s;
+}
+
+.chat .welcome-flame3 {
+  animation-name: welcomeFlicker3;
+  animation-delay: 1s;
+}
+
+@keyframes welcomeLogoFloat {
+  0%, 100% { 
+    transform: translateY(0px) scale(1);
+    box-shadow: 
+      0 8px 32px rgba(255,107,53,0.2),
+      0 0 40px rgba(255,235,59,0.1);
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 
+      0 12px 40px rgba(255,107,53,0.3),
+      0 0 50px rgba(255,235,59,0.2);
+  }
+}
+
+@keyframes welcomeFlicker1 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  33% { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  66% { transform: scale(0.95) rotate(-1deg); opacity: 0.85; }
+}
+
+@keyframes welcomeFlicker2 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+  33% { transform: scale(0.92) rotate(-2deg); opacity: 0.9; }
+  66% { transform: scale(1.05) rotate(1.5deg); opacity: 1; }
+}
+
+@keyframes welcomeFlicker3 {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+  33% { transform: scale(1.06) rotate(1.5deg); opacity: 0.95; }
+  66% { transform: scale(0.94) rotate(-1.5deg); opacity: 0.88; }
 }
 
 @keyframes float {
