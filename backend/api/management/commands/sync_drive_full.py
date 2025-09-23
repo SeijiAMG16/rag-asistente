@@ -32,6 +32,9 @@ class Command(BaseCommand):
         - Simula una petición POST con los parámetros recibidos
         - Muestra el resultado en consola (OK o error)
         """
+        # Asegura que la vista no exija autenticación para este comando
+        os.environ["AUTH_REQUIRED"] = "false"
+
         from api.views import sync_drive_full_view
         from django.test import RequestFactory
 

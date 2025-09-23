@@ -194,7 +194,7 @@ def ingest_view(request):
         # Define rutas de carpetas
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         text_dir = os.path.join(project_root, "data", "texts")
-        chroma_dir = os.path.join(project_root, "chroma_db")
+        chroma_dir = os.environ.get("CHROMA_DIR") or os.path.join(project_root, "chroma_db")
 
         # Configuración de fragmentación
         CHUNK_SIZE = int(request.data.get("chunk_size", 500))
@@ -345,7 +345,7 @@ def ingest_upload_view(request):
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         pdf_dir = os.path.join(project_root, "data", "pdfs")
         text_dir = os.path.join(project_root, "data", "texts")
-        chroma_dir = os.path.join(project_root, "chroma_db")
+        chroma_dir = os.environ.get("CHROMA_DIR") or os.path.join(project_root, "chroma_db")
         os.makedirs(pdf_dir, exist_ok=True)
         os.makedirs(text_dir, exist_ok=True)
 
@@ -429,7 +429,7 @@ def sync_drive_full_view(request):
         project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         pdf_dir = os.path.join(project_root, "data", "pdfs")
         text_dir = os.path.join(project_root, "data", "texts")
-        chroma_dir = os.path.join(project_root, "chroma_db")
+        chroma_dir = os.environ.get("CHROMA_DIR") or os.path.join(project_root, "chroma_db")
         os.makedirs(pdf_dir, exist_ok=True)
         os.makedirs(text_dir, exist_ok=True)
 

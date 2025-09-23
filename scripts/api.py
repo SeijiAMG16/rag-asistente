@@ -13,7 +13,10 @@ CHROMA_DIR = os.path.join(PROJECT_ROOT, "chroma_db")
 
 # --- ChromaDB ---
 client = chromadb.PersistentClient(path=CHROMA_DIR)
-collection = client.get_collection("documents")
+try:
+    collection = client.get_collection("documents")
+except Exception:
+    collection = client.get_or_create_collection("documents")
 
 # --- Embeddings model ---
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")

@@ -20,4 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('api.urls')),
+    # Prefijo alternativo para compatibilidad con clientes que usen /api/...
+    path('api/', include('api.urls')),
 ]

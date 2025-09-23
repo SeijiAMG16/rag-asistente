@@ -8,7 +8,10 @@ CHROMA_DIR = os.path.join(PROJECT_ROOT, "chroma_db")
 
 # --- Inicializa ChromaDB persistente (nueva API) ---
 client = chromadb.PersistentClient(path=CHROMA_DIR)
-collection = client.get_collection("documents")
+try:
+    collection = client.get_collection("documents")
+except Exception:
+    collection = client.get_or_create_collection("documents")
 
 # --- Usa el mismo modelo de embeddings que en la ingesta ---
 model = SentenceTransformer("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
