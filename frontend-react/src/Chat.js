@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { query as queryApi, syncDrive, uploadPdf, getConversations, getMessages, syncDriveFull } from './api';
+import './Chat.css';
 
 const Chat = ({ onLogout }) => {
   const [message, setMessage] = useState('');
@@ -55,13 +56,13 @@ const Chat = ({ onLogout }) => {
     e.preventDefault();
     if (!message.trim()) return;
 
-    const userMessage = { 
-      id: Date.now(), 
-      text: message, 
-      sender: 'user', 
+    const userMessage = {
+      id: Date.now(),
+      text: message,
+      sender: 'user',
       timestamp: new Date().toLocaleTimeString()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setMessage('');
     setIsLoading(true);
@@ -79,8 +80,10 @@ const Chat = ({ onLogout }) => {
       // Actualizar conversación activa si el backend la creó
       if (!activeConversation && response.conversation_id) {
         setActiveConversation(response.conversation_id);
-        // refrescar lista de conversaciones
-        try { const r = await getConversations(); setConversations(r.conversations || []); } catch {}
+        try {
+          const r = await getConversations();
+          setConversations(r.conversations || []);
+        } catch {}
       }
     } catch (error) {
       console.error('Error:', error);
@@ -103,164 +106,201 @@ const Chat = ({ onLogout }) => {
   };
 
   return (
-    <div className="chat-container">
-      {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <button className="toggle-sidebar" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? '←' : '→'}
-          </button>
-          {sidebarOpen && (
-            <button className="new-chat-btn" onClick={startNewConversation}>
-              Nueva Conversación
+    <div className="chat">
+      <div className={`chat-container ${!sidebarOpen ? 'sidebar-closed' : ''}`}>
+        {/* Sidebar */}
+        <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+          <div className="sidebar-header">
+            <button
+              className="toggle-sidebar"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle sidebar"
+            >
+              {sidebarOpen ? '◀' : '▶'}
             </button>
-          )}
-        </div>
-        
-        {sidebarOpen && (
-          <>
-            <div className="conversations-section">
-              <h4>Chats</h4>
-              <div className="conversations-list">
-                {conversations.map(conv => (
-                  <div
-                    key={conv.id}
-                    className={`conversation-item ${activeConversation === conv.id ? 'active' : ''}`}
-                    onClick={() => setActiveConversation(conv.id)}
-                  >
-                    {conv.title}
-                  </div>
-                ))}
-              </div>
-              <div style={{padding:'10px'}}>
-                <button className="new-chat-btn" onClick={async ()=>{
-                  setActionMsg('Sincronizando Drive...');
-                  try { const r = await syncDrive(); setActionMsg(`Descargados: ${(r.downloaded||[]).length}, Omitidos: ${(r.skipped||[]).length}`); } catch(e){ setActionMsg('Error al sincronizar Drive'); }
-                }}>Sync Drive</button>
-                <button className="new-chat-btn" style={{marginTop:8}} onClick={async ()=>{
-                  setActionMsg('Sync + extraer + ingestar desde Drive...');
-                  try {
-                    const r = await syncDriveFull({ force: false });
-                    const d = (r.downloaded||[]).length, s = (r.skipped||[]).length, i = (r.ingested||[]).length;
-                    setActionMsg(`Descargados:${d} Omitidos:${s} Ingeridos:${i}`);
-                  } catch(e){ setActionMsg('Error en Sync+Ingest'); }
-                }}>Sync+Ingest Drive</button>
-                <label style={{display:'block', marginTop:8}}>
-                  Subir PDF
-                  <input type="file" accept="application/pdf" onChange={async (ev)=>{
-                    const f = ev.target.files?.[0]; if(!f) return;
-                    setActionMsg('Subiendo/ingestando PDF...');
-                    try { const r = await uploadPdf(f); setActionMsg(`Chunks agregados: ${r.chunks_added}`); } catch(e){ setActionMsg('Error al subir/ingerir'); }
-                    ev.target.value = '';
-                  }}/>
-                </label>
-                {actionMsg && <div style={{marginTop:6, fontSize:12}}>{actionMsg}</div>}
-              </div>
-            </div>
-            
-            <div className="sidebar-footer">
-              <button className="logout-btn" onClick={onLogout}>
-                Cerrar Sesión
+
+            {sidebarOpen && (
+              <button className="new-chat-btn" onClick={startNewConversation}>
+                Nueva Conversación
               </button>
-            </div>
-          </>
-        )}
-      </div>
+            )}
+          </div>
 
-      {/* Main Chat Area */}
-      <div className="chat-main">
-        <div className="chat-header">
-          <h1>Asistente RAG Inteligente</h1>
-        </div>
-
-        <div className="messages-container">
-          {messages.length === 0 ? (
-            <div className="welcome-message">
-              <div className="welcome-icon">🤖</div>
-              <h2>¡Hola! Soy tu asistente para consultar documentación</h2>
-              <p>Pregúntame lo que necesites sobre los documentos disponibles</p>
-            </div>
-          ) : (
+          {sidebarOpen && (
             <>
-              {messages.map(msg => (
-                <div key={msg.id} className={`message ${msg.sender}-message`}>
-                  <div className="message-avatar">
-                    {msg.sender === 'user' ? '👤' : '🤖'}
-                  </div>
-                  <div className="message-content">
-                    <div className="message-text">
-                      {msg.text}
+              <div className="conversations-section">
+                <h4 className="sidebar-title">Chats</h4>
+                <div className="conversations-list">
+                  {conversations.map(conv => (
+                    <div
+                      key={conv.id}
+                      className={`conversation-item ${activeConversation === conv.id ? 'active' : ''}`}
+                      onClick={() => setActiveConversation(conv.id)}
+                      title={conv.title}
+                    >
+                      {conv.title}
                     </div>
-                    {msg.sources && msg.sources.length > 0 && (
-                      <div className="message-sources">
-                        <div className="sources-header">
-                          📄 Fuentes consultadas ({msg.sources.length}) ▼
-                        </div>
-                        <div className="sources-list">
-                          {msg.sources.map((source, idx) => (
-                            <div key={idx} className="source-item">
-                              🔗 {source.metadata?.source || `Fuente ${idx + 1}`}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    <div className="message-time">
-                      ⏰ {msg.timestamp}
-                    </div>
-                    {msg.sender === 'bot' && !msg.isError && (
-                      <div className="message-feedback">
-                        <span>¿Te ayudó esta respuesta?</span>
-                        <button className="feedback-btn">👍</button>
-                        <button className="feedback-btn">👎</button>
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              ))}
-              {isLoading && (
-                <div className="message bot-message">
-                  <div className="message-avatar">🤖</div>
-                  <div className="message-content">
-                    <div className="typing-indicator">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </div>
+
+                <div className="sidebar-actions">
+                  <button
+                    className="action-btn"
+                    onClick={async () => {
+                      setActionMsg('Sincronizando Drive...');
+                      try {
+                        const r = await syncDrive();
+                        setActionMsg(`Descargados: ${(r.downloaded||[]).length}, Omitidos: ${(r.skipped||[]).length}`);
+                      } catch (e) {
+                        setActionMsg('Error al sincronizar Drive');
+                      }
+                    }}
+                  >
+                    Sync Drive
+                  </button>
+
+                  <button
+                    className="action-btn"
+                    onClick={async () => {
+                      setActionMsg('Sync + extraer + ingestar desde Drive...');
+                      try {
+                        const r = await syncDriveFull({ force: false });
+                        const d = (r.downloaded||[]).length, s = (r.skipped||[]).length, i = (r.ingested||[]).length;
+                        setActionMsg(`Descargados:${d} Omitidos:${s} Ingeridos:${i}`);
+                      } catch (e) {
+                        setActionMsg('Error en Sync+Ingest');
+                      }
+                    }}
+                  >
+                    Sync+Ingest Drive
+                  </button>
+
+                  <label className="upload-label">
+                    Subir PDF
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={async (ev) => {
+                        const f = ev.target.files?.[0]; if (!f) return;
+                        setActionMsg('Subiendo/ingestando PDF...');
+                        try {
+                          const r = await uploadPdf(f);
+                          setActionMsg(`Chunks agregados: ${r.chunks_added}`);
+                        } catch (e) {
+                          setActionMsg('Error al subir/ingerir');
+                        }
+                        ev.target.value = '';
+                      }}
+                    />
+                  </label>
+
+                  {actionMsg && <div className="action-msg">{actionMsg}</div>}
                 </div>
-              )}
-              <div ref={messagesEndRef} />
+              </div>
+
+              <div className="sidebar-footer">
+                <button className="logout-btn" onClick={onLogout}>
+                  Cerrar Sesión
+                </button>
+              </div>
             </>
           )}
-        </div>
+        </aside>
 
-        <div className="input-container">
-          <form onSubmit={handleSubmit} className="input-form">
-            <div className="input-wrapper">
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ingresa tu consulta"
-                className="message-input"
-                rows="1"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-              />
-              <button 
-                type="submit" 
-                className="send-button"
-                disabled={isLoading || !message.trim()}
-              >
-                ✈️
-              </button>
-            </div>
-          </form>
-        </div>
+        {/* Main Chat Area */}
+        <main className="chat-main">
+          <header className="chat-header">
+            <h1>Asistente RAG Inteligente</h1>
+          </header>
+
+          <section className="messages-container">
+            {messages.length === 0 ? (
+              <div className="welcome-message">
+                <div className="welcome-icon">🤖</div>
+                <h2>¡Hola! Soy tu asistente para consultar documentación</h2>
+                <p>Pregúntame lo que necesites sobre los documentos disponibles</p>
+              </div>
+            ) : (
+              <>
+                {messages.map(msg => (
+                  <article key={msg.id} className={`message ${msg.sender}-message ${msg.isError ? 'error' : ''}`}>
+                    <div className="message-avatar">
+                      {msg.sender === 'user' ? '👤' : '🤖'}
+                    </div>
+                    <div className="message-bubble">
+                      <div className="message-text">{msg.text}</div>
+
+                      {msg.sources && msg.sources.length > 0 && (
+                        <div className="message-sources">
+                          <div className="sources-header">📄 Fuentes consultadas ({msg.sources.length}) ▼</div>
+                          <div className="sources-list">
+                            {msg.sources.map((source, idx) => (
+                              <div key={idx} className="source-item">
+                                🔗 {source.metadata?.source || `Fuente ${idx + 1}`}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="message-meta">
+                        <span className="message-time">⏰ {msg.timestamp}</span>
+                        {msg.sender === 'bot' && !msg.isError && (
+                          <span className="message-feedback">
+                            ¿Te ayudó esta respuesta?
+                            <button className="feedback-btn" type="button" aria-label="Me ayudó">👍</button>
+                            <button className="feedback-btn" type="button" aria-label="No me ayudó">👎</button>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                ))}
+
+                {isLoading && (
+                  <article className="message bot-message">
+                    <div className="message-avatar">🤖</div>
+                    <div className="message-bubble">
+                      <div className="typing-indicator" aria-label="Escribiendo">
+                        <span></span><span></span><span></span>
+                      </div>
+                    </div>
+                  </article>
+                )}
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </section>
+
+          <footer className="input-container">
+            <form onSubmit={handleSubmit} className="input-form">
+              <div className="input-wrapper">
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Ingresa tu consulta"
+                  className="message-input"
+                  rows="1"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="send-button"
+                  disabled={isLoading || !message.trim()}
+                  aria-label="Enviar"
+                  title="Enviar"
+                >
+                  ✈️
+                </button>
+              </div>
+            </form>
+          </footer>
+        </main>
       </div>
     </div>
   );
