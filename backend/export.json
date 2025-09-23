@@ -1,0 +1,134 @@
+[
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$hRxgBwZyw4JTr4u5S5iMLa$f4cD7DYsqG7Y1Yf+vm54UMW2I8WY6TzdfOdxoXOk9kI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser",
+    "first_name": "",
+    "last_name": "",
+    "email": "testuser@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-21T18:24:18.736Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$oCbJxJifWRSZC1431P7a5M$4ReIKLO+SWODcuZ3d+gvwNJXgI83LIIDPxLgafAtamQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser2",
+    "first_name": "",
+    "last_name": "",
+    "email": "testuser2@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-21T18:24:45.073Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$tDJyG8vSvmEunGK4M5SQw0$xcEEmQ0rkWv9XqqAYz801Jxz2ubTbvi304nvSgTLhXs=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "usuario",
+    "first_name": "",
+    "last_name": "",
+    "email": "usuario@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-21T19:01:23.157Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$aI9oHMqNLhpqvciiRkovSW$6i+nR0mlvHXJT5HBr2VhOs5evyzbS6tm2nsywSduddY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "usuario2",
+    "first_name": "",
+    "last_name": "",
+    "email": "usuario2@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-21T19:38:13.563Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "api.conversation",
+  "pk": 1,
+  "fields": {
+    "user": 3,
+    "title": "Hola papu",
+    "created_at": "2025-09-21T19:32:54.084Z",
+    "updated_at": "2025-09-21T19:32:54.084Z"
+  }
+},
+{
+  "model": "api.conversation",
+  "pk": 2,
+  "fields": {
+    "user": 3,
+    "title": "Conversación 2",
+    "created_at": "2025-09-21T19:34:05.553Z",
+    "updated_at": "2025-09-21T19:34:05.553Z"
+  }
+},
+{
+  "model": "api.message",
+  "pk": 1,
+  "fields": {
+    "conversation": 1,
+    "sender": "user",
+    "text": "Hola papu",
+    "created_at": "2025-09-21T19:32:54.089Z"
+  }
+},
+{
+  "model": "api.message",
+  "pk": 2,
+  "fields": {
+    "conversation": 1,
+    "sender": "bot",
+    "text": "Basándome en los documentos analizados, encontré la siguiente información relevante:\n\n[Fuente 1 - test_documento.txt]:\nRAG Asistente - Documentación de Prueba\n\nEste es un documento de prueba para verificar que el sistema RAG (Retrieval-Augmented Generation) funciona correctamente.\n\nEl RAG Asistente es un sistema que combina:\n1. Embeddings para búsqueda semántica\n2. ChromaDB como base de datos vectorial\n3. Modelos de lenguaje para generar respuestas\n\nCaracterísticas principales:\n- Procesamiento de documentos PDF\n- ...\n\n[Fuente 2 - test_documento.txt]:\nas por IA\n- Interfaz web moderna\n\nConfiguración técnica:\n- Backend: Django + DRF\n- Frontend: React + Axios\n- Base de datos: MySQL + ChromaDB\n- Modelo de embeddings: paraphrase-multilingual-MiniLM-L12-v2\n- Modelo generativo: Qwen/Qwen1.5-1.8B-Chat\n\nEste sistema permite hacer preguntas sobre los documentos ingresados y obtener respuestas relevantes basadas en el contenido.\n\n\nEsta información se extrajo de 2 documentos relacionados con tu con...",
+    "created_at": "2025-09-21T19:33:29.447Z"
+  }
+},
+{
+  "model": "api.message",
+  "pk": 3,
+  "fields": {
+    "conversation": 2,
+    "sender": "user",
+    "text": "Conversación 2",
+    "created_at": "2025-09-21T19:34:05.558Z"
+  }
+},
+{
+  "model": "api.message",
+  "pk": 4,
+  "fields": {
+    "conversation": 2,
+    "sender": "bot",
+    "text": "Basándome en los documentos analizados, encontré la siguiente información relevante:\n\n[Fuente 1 - test_documento.txt]:\nas por IA\n- Interfaz web moderna\n\nConfiguración técnica:\n- Backend: Django + DRF\n- Frontend: React + Axios\n- Base de datos: MySQL + ChromaDB\n- Modelo de embeddings: paraphrase-multilingual-MiniLM-L12-v2\n- Modelo generativo: Qwen/Qwen1.5-1.8B-Chat\n\nEste sistema permite hacer preguntas sobre los documentos ingresados y obtener respuestas relevantes basadas en el contenido.\n\n[Fuente 2 - test_documento.txt]:\nRAG Asistente - Documentación de Prueba\n\nEste es un documento de prueba para verificar que el sistema RAG (Retrieval-Augmented Generation) funciona correctamente.\n\nEl RAG Asistente es un sistema que combina:\n1. Embeddings para búsqueda semántica\n2. ChromaDB como base de datos vectorial\n3. Modelos de lenguaje para generar respuestas\n\nCaracterísticas principales:\n- Procesamiento de documentos PDF\n- ...\n\n\nEsta información se extrajo de 2 documentos relacionados con tu con...",
+    "created_at": "2025-09-21T19:34:08.815Z"
+  }
+}
+]

@@ -1,0 +1,41 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+ENV/
+
+# Archivos de configuración sensibles
+.env
+config.py
+credentials.json
+
+# Configuración de usuario de VSCode y otros editores
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos temporales de Python y cachés
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Archivos de bases de datos locales generadas por ChromaDB
+chroma_db/
+
+# Salidas y logs
+*.log
+*.out
+
+# Archivos temporales y de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos del navegador Streamlit
+.streamlit/
+
+# Documentos de datos (puedes cambiar esto según quieras subir ejemplos o no)
+data/docx/
+data/pdfs/
+data/texts/
