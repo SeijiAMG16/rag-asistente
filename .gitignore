@@ -9,7 +9,6 @@ build/
 # Archivos de configuración sensibles
 .env
 config.py
-credentials.json
 
 # Configuración de usuario de VSCode y otros editores
 .vscode/
