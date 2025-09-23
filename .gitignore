@@ -3,6 +3,8 @@ venv/
 .venv/
 env/
 ENV/
+node_modules/
+build/
 
 # Archivos de configuración sensibles
 .env
@@ -13,6 +15,8 @@ credentials.json
 .vscode/
 .idea/
 *.code-workspace
+.spyderproject
+.spyproject
 
 # Archivos temporales de Python y cachés
 __pycache__/
@@ -21,16 +25,25 @@ __pycache__/
 *.pyd
 *.pyc
 
-# Archivos de bases de datos locales generadas por ChromaDB
+# Archivos de migraciones Django caché
+*/migrations/__pycache__/
+
+# Archivos de bases de datos locales generadas por ChromaDB y Django
 chroma_db/
+db.sqlite3
+*.db
+*.sqlite3
 
 # Salidas y logs
 *.log
 *.out
+logs/
+reports/
 
 # Archivos temporales y de sistema
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Archivos del navegador Streamlit
 .streamlit/
@@ -39,3 +52,11 @@ Thumbs.db
 data/docx/
 data/pdfs/
 data/texts/
+
+# Archivos de exportación y backups
+*.bak
+*.tmp
+export.json
+
+# Lock de dependencias (opcional)
+yarn.lock
