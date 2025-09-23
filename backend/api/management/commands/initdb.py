@@ -49,8 +49,10 @@ class Command(BaseCommand):
             cur.execute(f"CREATE DATABASE IF NOT EXISTS `{db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")
             self.stdout.write(f"Base `{db_name}` lista.")
 
-            cur.execute(f"CREATE USER IF NOT EXISTS '{app_user}'@'%' IDENTIFIED BY %s;", (app_password,))
-            cur.execute(f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO '{app_user}'@'%';")
+            cur.execute("CREATE USER IF NOT EXISTS %s@'%%' IDENTIFIED BY %s;", (app_user, app_password))
+            cur.execute("CREATE USER IF NOT EXISTS %s@'localhost' IDENTIFIED BY %s;", (app_user, app_password))
+            cur.execute(f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO %s@'%%';", (app_user,))
+            cur.execute(f"GRANT ALL PRIVILEGES ON `{db_name}`.* TO %s@'localhost';", (app_user,))
             cur.execute("FLUSH PRIVILEGES;")
             conn.commit()
             self.stdout.write(f"Usuario `{app_user}` con permisos en `{db_name}` listo.")
