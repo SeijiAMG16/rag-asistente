@@ -13,6 +13,14 @@ from .models import Conversation, Message
 # Configura el logger para registrar eventos importantes del sistema
 logger = logging.getLogger(__name__)
 
+# Importar sistema RAG simplificado
+try:
+    from utils.simple_rag_integration import query_rag_simple, get_rag_stats_simple
+    RAG_SYSTEM_AVAILABLE = True
+except ImportError as e:
+    logging.warning(f"Sistema RAG no disponible: {e}")
+    RAG_SYSTEM_AVAILABLE = False
+
 # Variable para saber si la autenticación es obligatoria (por variable de entorno)
 AUTH_REQUIRED = os.environ.get("AUTH_REQUIRED", "true").lower() == "true"
 
@@ -118,19 +126,49 @@ def query_view(request):
         )
         # Busca los fragmentos más relevantes
         search_results = perform_semantic_search(question, top_k)
-        sources = []
-        for i, result in enumerate(search_results[:3]):
-            sources.append({
-                "title": result.get("archivo", f"Documento {i+1}"),
-                "snippet": (result.get("texto", "")[:200] + "...") if len(result.get("texto", "")) > 200 else result.get("texto", ""),
-                "page": result.get("chunk", i),
-                "uri": f"#chunk-{result.get('chunk', i)}",
-                "chunk_index": result.get("chunk", i),
-                "metadata": result.get("metadata", {}),
-            })
-        # Genera la respuesta final
-        answer_raw = generate_rag_response(question, search_results)
-        answer = clean_and_format_response(answer_raw)
+        
+        # Genera la respuesta final (ahora incluye fuentes estructuradas)
+        rag_response = generate_rag_response(question, search_results)
+        
+        # Manejar ambos tipos de respuesta (string legacy o nueva estructura)
+        if isinstance(rag_response, dict):
+            # Nueva estructura con fuentes integradas
+            answer = rag_response["respuesta"]
+            fuentes_integradas = rag_response["fuentes"]
+            total_fuentes = rag_response["total_fuentes"]
+            
+            # Convertir fuentes al formato legacy para compatibilidad
+            sources = []
+            for fuente in fuentes_integradas:
+                sources.append({
+                    "title": fuente["archivo"],
+                    "snippet": fuente["texto_preview"],
+                    "page": fuente["chunk"],
+                    "uri": f"#chunk-{fuente['chunk']}",
+                    "chunk_index": fuente["chunk"],
+                    "similarity_score": fuente["similarity_score"],
+                    "numero_fuente": fuente["numero"],
+                    "metadata": {"fuente_numero": fuente["numero"], "relevancia": fuente["similarity_score"]},
+                })
+        else:
+            # Respuesta legacy (string simple)
+            answer = clean_and_format_response(rag_response)
+            total_fuentes = len(search_results)
+            
+            # Crear fuentes en formato legacy
+            sources = []
+            for i, result in enumerate(search_results[:5]):
+                sources.append({
+                    "title": result.get("archivo", f"Documento {i+1}"),
+                    "snippet": (result.get("texto", "")[:200] + "...") if len(result.get("texto", "")) > 200 else result.get("texto", ""),
+                    "page": result.get("chunk", i),
+                    "uri": f"#chunk-{result.get('chunk', i)}",
+                    "chunk_index": result.get("chunk", i),
+                    "similarity_score": result.get("similarity_score", 0),
+                    "numero_fuente": i + 1,
+                    "metadata": result.get("metadata", {}),
+                })
+        
         # Guarda el mensaje del bot en el historial
         Message.objects.create(conversation=conv, sender='bot', text=answer)
     except Exception as e:
@@ -162,21 +200,32 @@ def query_view(request):
         "status_code": 200,
     })
 
-    # Retorna la respuesta y metadatos
+    # Retorna la respuesta y metadatos mejorados
     return Response({
         "answer": answer,
         "message": answer,
         "response": answer,
         "sources": sources,
+        "fuentes": sources,  # Alias en español
         "resultados": search_results,
         "conversation_id": conv.id if 'conv' in locals() and conv else conversation_id,
         "metadata": {
             "query_time_ms": latency_ms,
             "sources_found": len(sources),
             "total_results": len(search_results),
+            "total_fuentes": len(sources),
             "top_k_requested": top_k,
             "chroma_db_used": True,
+            "llm_provider": "groq",
+            "respuesta_con_fuentes": isinstance(rag_response, dict),
+            "caracteres_respuesta": len(answer),
         },
+        "analytics": {
+            "tiempo_procesamiento_ms": latency_ms,
+            "documentos_analizados": len(search_results),
+            "fuentes_citadas": len(sources),
+            "query_procesada": question,
+        }
     }, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
@@ -567,3 +616,76 @@ def messages_view(request, conv_id: int):
         return Response({"messages": data, "conversation": {"id": conv.id, "title": conv.title}})
     except Conversation.DoesNotExist:
         return Response({"error": "Conversación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+# ============================================
+# VISTAS DEL SISTEMA RAG SIMPLIFICADO
+# ============================================
+
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Sin autenticación para pruebas
+def chat_simple(request):
+    """Chat con sistema RAG simplificado"""
+    try:
+        if not RAG_SYSTEM_AVAILABLE:
+            return Response({
+                'error': 'Sistema RAG no disponible',
+                'details': 'El sistema RAG no se pudo cargar correctamente'
+            }, status=503)
+
+        user_input = request.data.get('message', '').strip()
+        if not user_input:
+            return Response({'error': 'Mensaje vacío'}, status=400)
+        
+        # Consultar sistema RAG simplificado
+        rag_response = query_rag_simple(user_input)
+        
+        if rag_response.get('error'):
+            return Response({
+                'error': 'Error en sistema RAG',
+                'details': rag_response.get('error')
+            }, status=500)
+        
+        # Guardar conversación si está autenticado
+        conversation_id = None
+        if AUTH_REQUIRED and hasattr(request, 'user') and request.user.is_authenticated:
+            conversation = Conversation.objects.create(
+                user=request.user,
+                user_input=user_input,
+                bot_response=rag_response['answer']
+            )
+            conversation_id = conversation.id
+        
+        return Response({
+            'response': rag_response['answer'],
+            'sources': rag_response.get('sources', []),
+            'conversation_id': conversation_id,
+            'metadata': rag_response.get('metadata', {}),
+            'system_type': 'simple_rag'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error en chat_simple: {e}")
+        return Response({
+            'error': f'Error interno: {str(e)}'
+        }, status=500)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Sin autenticación para pruebas
+def rag_status_simple(request):
+    """Obtener estado del sistema RAG simplificado"""
+    try:
+        if not RAG_SYSTEM_AVAILABLE:
+            return Response({
+                'status': 'unavailable',
+                'error': 'Sistema RAG no disponible'
+            })
+        
+        stats = get_rag_stats_simple()
+        return Response(stats)
+        
+    except Exception as e:
+        logger.error(f"Error en rag_status_simple: {e}")
+        return Response({
+            'status': 'error',
+            'error': str(e)
+        }, status=500)

@@ -161,3 +161,67 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================================================
+# CONFIGURACIÓN AUTOMÁTICA DE BASE DE DATOS
+# ============================================================================
+
+import sys
+import django
+
+# Solo ejecutar auto-configuración cuando se inicia el servidor
+if 'runserver' in sys.argv or 'migrate' in sys.argv:
+    
+    def auto_configure_database():
+        """Auto-configurar base de datos al iniciar Django"""
+        
+        print("🚀 INICIANDO AUTO-CONFIGURACIÓN...")
+        
+        try:
+            import mysql.connector
+            from mysql.connector import Error
+            
+            # Configuración de la base de datos
+            db_config = {
+                'host': os.environ.get('DB_HOST', 'localhost'),
+                'port': os.environ.get('DB_PORT', '3306'),
+                'user': os.environ.get('DB_USER', 'root'),
+                'password': os.environ.get('DB_PASSWORD', ''),
+                'database': os.environ.get('DB_NAME', 'rag_asistente'),
+            }
+            
+            print(f"🔍 Verificando base de datos '{db_config['database']}'...")
+            
+            # Crear base de datos si no existe
+            try:
+                connection = mysql.connector.connect(
+                    host=db_config['host'],
+                    port=db_config['port'],
+                    user=db_config['user'],
+                    password=db_config['password']
+                )
+                
+                cursor = connection.cursor()
+                cursor.execute(f"CREATE DATABASE IF NOT EXISTS `{db_config['database']}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci")
+                cursor.close()
+                connection.close()
+                
+                print(f"✅ Base de datos '{db_config['database']}' lista")
+                
+            except Error as e:
+                print(f"⚠️ MySQL Error: {e}")
+                print("💡 Asegúrate de que MySQL esté ejecutándose")
+                
+        except ImportError:
+            print("⚠️ mysql-connector-python no instalado")
+            print("💡 Instala con: pip install mysql-connector-python")
+        
+        except Exception as e:
+            print(f"⚠️ Error en auto-configuración: {e}")
+    
+    # Ejecutar auto-configuración
+    auto_configure_database()
+
+# ============================================================================
+# FIN DE AUTO-CONFIGURACIÓN
+# ============================================================================

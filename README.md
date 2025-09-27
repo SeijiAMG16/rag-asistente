@@ -1,8 +1,142 @@
-# 📚 Asistente RAG Local (Django + React + ChromaDB + Google Drive + MySQL)
+# � RAG ASISTENTE - Sistema Autónomo Completo
 
-Asistente conversacional local para consultar tus propios documentos PDF desde Google Drive, combinando búsqueda semántica con RAG (Retrieval-Augmented Generation) y una interfaz web moderna.
+Sistema de RAG (Retrieval-Augmented Generation) completamente autónomo que se configura automáticamente.
+
+## ✨ Características Principales
+
+- **🤖 Análisis Inteligente**: Integración con múltiples modelos LLM (Groq Llama 3.3-70B, OpenAI)
+- **🛠️ Configuración Automática**: Sin scripts manuales, sin configuración compleja
+- **💾 Base de Datos MySQL**: Configuración automática con usuarios predefinidos
+- **🔒 Autenticación JWT**: Sistema completo de login/registro
+- **📚 ChromaDB**: Vector database con 699+ documentos
+- **🌐 API REST**: Endpoints completos para frontend
+
+## 🎯 INICIO RÁPIDO (1 COMANDO)
+
+### Opción 1: Usando PowerShell (Recomendado)
+```powershell
+cd backend
+.\INICIAR_RAG.ps1
+```
+
+### Opción 2: Usando Python directamente  
+```bash
+cd backend
+python start_rag.py
+```
+
+**¡ESO ES TODO!** 🎉
+
+El sistema automáticamente:
+- ✅ Instala todas las dependencias
+- ✅ Configura MySQL (base de datos: `rag_asistente`)
+- ✅ Ejecuta migraciones de Django
+- ✅ Crea usuario administrador (`admin`/`admin123`)
+- ✅ Inicia el servidor en `http://localhost:8000`
+
+## 🔧 Requisitos Mínimos
+
+- **Python 3.8+**
+- **MySQL Server** (con usuario `root`/`sistemas`)
+- **Windows/Linux/Mac**
+
+## 📱 Usuarios Predefinidos
+
+El sistema incluye usuarios de ejemplo:
+- `admin` / `admin123` (Administrador)
+- `testuser` / `password123`
+- `usuario` / `password123`
+
+## 🌐 Endpoints API
+
+- `POST /api/register/` - Registro de usuarios
+- `POST /api/login/` - Inicio de sesión  
+- `POST /api/logout/` - Cerrar sesión
+- `POST /api/chat/` - Chat con RAG
+- `GET /api/me/` - Información del usuario
+
+## 🧠 Sistema de Análisis
+
+### Proveedores LLM (en orden de prioridad):
+1. **Groq API** (Llama 3.3-70B) - Ultra rápido
+2. **OpenAI API** (GPT-4) - Fallback inteligente
+3. **Análisis Local** - Cuando no hay APIs
+
+### Características Anti-Ambigüedad:
+- Prompts especializados para consultas específicas
+- Análisis contextual profundo
+- Respuestas estructuradas y precisas
+- Enfoque en documentos peruanos/locales
+
+## 📂 Estructura del Proyecto
+
+```
+rag-asistente/
+├── backend/               # Django Backend
+│   ├── INICIAR_RAG.ps1   # 🚀 SCRIPT PRINCIPAL
+│   ├── start_rag.py      # Script maestro Python
+│   ├── manage.py         # Django management
+│   ├── bootstrap/        # Auto-configuración
+│   ├── api/             # REST API
+│   ├── core/            # Configuración Django
+│   └── utils/           # Utilidades RAG
+├── frontend-react/       # Frontend React
+├── chroma_db/           # Vector Database
+└── scripts/             # Scripts auxiliares
+```
+
+## 🔥 Características Avanzadas
+
+- **Auto-configuración**: Crea base de datos, usuario admin, migraciones
+- **Multi-LLM**: Fallback automático entre proveedores
+- **Vector Search**: ChromaDB con embeddings optimizados
+- **CORS Habilitado**: Listo para frontend
+- **JWT Tokens**: Autenticación robusta
+- **Logs Detallados**: Seguimiento completo del sistema
+
+## 🔍 Solución de Problemas
+
+### Error: MySQL no conecta
+```bash
+# Verificar que MySQL esté ejecutándose
+# Usuario: root, Password: sistemas
+```
+
+### Error: Dependencias faltantes
+```bash
+# El script instala automáticamente, pero si falla:
+pip install -r requirements.txt
+```
+
+### Error: Puerto ocupado
+```bash
+# Django usa puerto 8000 por defecto
+# Verificar que no haya otro proceso usando el puerto
+```
+
+## 🚀 Desarrollo
+
+Para desarrollo avanzado:
+```bash
+cd backend
+python manage.py shell          # Shell de Django
+python manage.py createsuperuser # Crear admin manual
+python manage.py collectstatic   # Archivos estáticos
+```
+
+## 🌟 Próximas Características
+
+- [ ] Interfaz web administrativa
+- [ ] Análisis de documentos PDF/DOCX
+- [ ] API de subida de documentos
+- [ ] Dashboard de métricas
+- [ ] Exportación de conversaciones
 
 ---
+
+**💡 Tip**: Para desarrollo frontend, usar `frontend-react/` con `npm start`
+
+**🔧 Soporte**: El sistema detecta automáticamente la configuración y se adapta al entorno
 
 ## 🚀 Características
 

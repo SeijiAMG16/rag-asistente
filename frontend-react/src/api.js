@@ -176,3 +176,30 @@ export async function getMessages(convId) {
   const { data } = await api.get(`/conversations/${convId}/messages`);
   return data;
 }
+
+// ===== FUNCIONES DE TESTING =====
+
+// Test simple del sistema RAG
+export async function testRagSimple(question = null) {
+  const params = question ? { q: question } : {};
+  const { data } = await api.get('/test/rag/simple', { params });
+  return data;
+}
+
+// Test con múltiples preguntas predefinidas
+export async function testRagMultiple() {
+  const { data } = await api.get('/test/rag/multiple');
+  return data;
+}
+
+// Obtener estado completo del sistema RAG
+export async function getRagSystemStatus() {
+  const { data } = await api.get('/test/rag/status');
+  return data;
+}
+
+// Test con pregunta personalizada
+export async function testCustomQuestion(question) {
+  const { data } = await api.post('/test/rag/custom', { question });
+  return data;
+}

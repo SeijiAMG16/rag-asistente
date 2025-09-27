@@ -241,11 +241,33 @@ const Chat = ({ onLogout }) => {
 
                       {msg.sources && msg.sources.length > 0 && (
                         <div className="message-sources">
-                          <div className="sources-header">📄 Fuentes consultadas ({msg.sources.length}) ▼</div>
+                          <div className="sources-header" onClick={(e) => {
+                            const list = e.target.nextElementSibling;
+                            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+                            e.target.innerHTML = list.style.display === 'none' 
+                              ? `📄 Fuentes consultadas (${msg.sources.length}) ▼`
+                              : `📄 Fuentes consultadas (${msg.sources.length}) ▲`;
+                          }}>
+                            📄 Fuentes consultadas ({msg.sources.length}) ▼
+                          </div>
                           <div className="sources-list">
                             {msg.sources.map((source, idx) => (
                               <div key={idx} className="source-item">
-                                🔗 {source.metadata?.source || `Fuente ${idx + 1}`}
+                                <div className="source-header">
+                                  <span className="source-number">#{source.numero_fuente || idx + 1}</span>
+                                  <span className="source-title">{source.title}</span>
+                                  {source.similarity_score && (
+                                    <span className="source-score">
+                                      📊 {(source.similarity_score * 100).toFixed(1)}%
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="source-snippet">{source.snippet}</div>
+                                {source.page && (
+                                  <div className="source-meta">
+                                    📄 Fragmento: {source.page}
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
