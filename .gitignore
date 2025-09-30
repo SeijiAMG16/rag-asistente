@@ -47,10 +47,13 @@ desktop.ini
 # Archivos del navegador Streamlit
 .streamlit/
 
-# Documentos de datos (puedes cambiar esto según quieras subir ejemplos o no)
+# Documentos de datos y archivos procesados
 data/docx/
 data/pdfs/
 data/texts/
+backend/data/
+chroma_db/
+chroma_db_simple/
 
 # Archivos de exportación y backups
 *.bak
@@ -59,5 +62,3 @@ export.json
 
 # Lock de dependencias (opcional)
 yarn.lock
-
-backend/data/
