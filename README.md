@@ -302,6 +302,25 @@ cd backend
 python manage.py sync_drive_full --chunk-size 600 --chunk-overlap 60
 ```
 
+### **Configurar Google Drive (Nueva PC):**
+```powershell
+# Windows - Configuración completa automática
+.\SINCRONIZAR_DRIVE.ps1 -Setup
+
+# Sincronización manual
+.\SINCRONIZAR_DRIVE.ps1
+
+# Daemon automático (cada 30 min)
+.\SINCRONIZAR_DRIVE.ps1 -Daemon
+```
+
+```bash
+# Linux/Mac - Comandos Django
+python manage.py start_drive_sync --action setup
+python manage.py start_drive_sync --action sync
+python manage.py start_drive_sync --action status
+```
+
 ---
 
 ## 🔧 Comandos Útiles
@@ -319,6 +338,31 @@ python manage.py createsuperuser
 ```
 
 ### **Gestión de Documentos:**
+```bash
+# Sincronización completa desde Drive
+python manage.py sync_drive_full --chunk-size 600 --chunk-overlap 60
+
+# Forzar re-descarga de todos los PDFs
+python manage.py sync_drive_full --force
+
+# ETL local (sin Google Drive)
+python etl_rag_complete.py --force
+```
+
+### **Google Drive Automation:**
+```powershell
+# Instalar dependencias de Drive
+.\INSTALAR_GOOGLE_DRIVE.ps1
+
+# Setup completo de Drive
+.\SINCRONIZAR_DRIVE.ps1 -Setup
+
+# Sincronización forzada
+.\SINCRONIZAR_DRIVE.ps1 -Force
+
+# Ver estado del sistema
+.\SINCRONIZAR_DRIVE.ps1 -Status
+```
 ```bash
 # Sincronización completa desde Drive
 python manage.py sync_drive_full --chunk-size 600 --chunk-overlap 60
