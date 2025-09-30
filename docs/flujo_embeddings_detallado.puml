@@ -1,0 +1,120 @@
+@startuml Flujo_Embeddings_Detallado
+!theme aws-orange
+
+title Proceso Completo de Embeddings - RAG Asistente
+
+participant "Usuario" as user
+participant "ETL Processor" as etl
+participant "PDF Extractor\n(pdfplumber)" as pdf_ext
+participant "Text Processor" as text_proc
+participant "Sentence Transformers\n(all-mpnet-base-v2)" as embed_model
+participant "ChromaDB" as chroma
+participant "Vector Store" as vector_store
+
+== Fase 1: Extracción de Documentos ==
+
+user -> etl : python etl_rag_complete.py --force
+activate etl
+
+etl -> etl : initialize_directories()
+note right : Crear directorios:\n- data/pdfs/\n- data/texts/\n- chroma_db_simple/
+
+etl -> pdf_ext : extract_from_pdfs()
+activate pdf_ext
+
+loop Para cada PDF en data/pdfs/
+    pdf_ext -> pdf_ext : open_pdf_with_pdfplumber()
+    pdf_ext -> pdf_ext : extract_text_per_page()
+    pdf_ext -> pdf_ext : clean_extracted_text()
+    note right : Limpiar:\n- Caracteres especiales\n- Saltos de línea\n- Espacios múltiples
+    pdf_ext -> text_proc : save_to_txt_file()
+end
+
+pdf_ext --> etl : extraction_complete
+deactivate pdf_ext
+
+== Fase 2: Procesamiento y Chunking ==
+
+etl -> text_proc : smart_chunk_text()
+activate text_proc
+
+text_proc -> text_proc : load_all_txt_files()
+
+loop Para cada archivo TXT
+    text_proc -> text_proc : preserve_academic_references()
+    note right : Preservar:\n- (Autor, año)\n- Referencias específicas\n- Contexto académico
+    
+    text_proc -> text_proc : intelligent_chunking()
+    note right : Algoritmo de chunking:\n- Tamaño: 800 tokens\n- Overlap: 100 tokens\n- Respeta párrafos\n- No corta referencias
+    
+    text_proc -> text_proc : create_chunk_metadata()
+    note right : Metadata:\n- source_file\n- chunk_index\n- page_number\n- original_length
+end
+
+text_proc --> etl : chunks_with_metadata[]
+deactivate text_proc
+
+== Fase 3: Generación de Embeddings ==
+
+etl -> embed_model : initialize_model()
+activate embed_model
+
+embed_model -> embed_model : load_all_mpnet_base_v2()
+note right : Modelo optimizado:\n- 768 dimensiones\n- Multilenguaje\n- Base: Microsoft/mpnet-base\n- Fine-tuned para similitud
+
+loop Para cada chunk de texto
+    etl -> embed_model : encode_chunk_text()
+    embed_model -> embed_model : tokenize_input()
+    embed_model -> embed_model : forward_pass_transformer()
+    embed_model -> embed_model : mean_pooling_strategy()
+    embed_model -> embed_model : normalize_vector_768d()
+    embed_model --> etl : embedding_vector[768]
+    
+    note right : Vector resultante:\n- 768 dimensiones\n- Normalizado L2\n- Representación semántica\n- Compatible con similitud coseno
+end
+
+embed_model --> etl : all_embeddings_generated
+deactivate embed_model
+
+== Fase 4: Almacenamiento en ChromaDB ==
+
+etl -> chroma : initialize_client()
+activate chroma
+
+chroma -> chroma : create_persistent_client()
+chroma -> chroma : get_or_create_collection("simple_rag_docs")
+
+etl -> chroma : batch_insert_embeddings()
+
+loop Para cada embedding + metadata
+    chroma -> vector_store : store_vector_with_metadata()
+    activate vector_store
+    
+    vector_store -> vector_store : create_index_entry()
+    note right : Índice HNSW:\n- Búsqueda eficiente\n- Similitud coseno\n- O(log n) complexity
+    
+    vector_store -> vector_store : store_metadata_sqlite()
+    note right : SQLite backend:\n- Metadata estructurada\n- Consultas rápidas\n- Persistencia local
+    
+    vector_store --> chroma : storage_complete
+    deactivate vector_store
+end
+
+chroma --> etl : collection_populated
+deactivate chroma
+
+etl -> etl : log_statistics()
+note right : Estadísticas finales:\n- Total PDFs procesados\n- Total chunks generados\n- Total embeddings creados\n- Tiempo de procesamiento
+
+etl --> user : ETL_COMPLETE\n✅ Base vectorial lista
+deactivate etl
+
+note over user, vector_store
+**RESULTADO FINAL:**
+- Vector Store con embeddings 768D
+- Búsqueda semántica optimizada
+- Metadata preservada para trazabilidad
+- Base preparada para consultas RAG
+end note
+
+@enduml

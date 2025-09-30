@@ -1,0 +1,102 @@
+@startuml Arquitectura_RAG_Completa
+!define RECTANGLE class
+
+title Sistema RAG Asistente - Arquitectura Completa
+
+!define PRIMARY_COLOR #E3F2FD
+!define SECONDARY_COLOR #BBDEFB
+!define ACCENT_COLOR #2196F3
+!define SUCCESS_COLOR #C8E6C9
+!define WARNING_COLOR #FFF3E0
+
+package "Frontend React" as frontend {
+    rectangle "React App\n(Puerto 3000)" as react_app
+    rectangle "API Client\n(api.js)" as api_client
+    rectangle "Chat Interface" as chat_ui
+    rectangle "Upload Component" as upload_comp
+}
+
+package "Backend Django" as backend {
+    rectangle "Django Server\n(Puerto 8000)" as django_server
+    rectangle "API Views\n(views.py)" as api_views
+    rectangle "RAG Utils\n(rag_utils.py)" as rag_utils
+    rectangle "ETL Processor\n(etl_rag_complete.py)" as etl_processor
+}
+
+package "Almacenamiento" as storage {
+    database "ChromaDB\n(Vector Store)" as chromadb {
+        rectangle "Embeddings 768D\n(all-mpnet-base-v2)" as embeddings
+        rectangle "Metadata\n(chunks, sources)" as metadata
+    }
+    
+    folder "File System" as filesystem {
+        folder "data/pdfs/\n(Documentos PDF)" as pdfs_folder
+        folder "data/texts/\n(Textos extraídos)" as texts_folder
+    }
+}
+
+package "Servicios Externos" as external {
+    cloud "Google Drive API" as google_drive
+    cloud "OpenRouter API\n(DeepSeek V3)" as openrouter
+    rectangle "PDF Processing\n(pdfplumber)" as pdf_processor
+}
+
+package "Modelos AI" as ai_models {
+    rectangle "Sentence Transformers\n(all-mpnet-base-v2)\n768 dimensions" as embedding_model
+    rectangle "DeepSeek V3\n(via OpenRouter)" as deepseek_model
+}
+
+' Conexiones principales
+react_app --> api_client
+api_client --> django_server : "HTTP Requests"
+django_server --> api_views
+api_views --> rag_utils : "perform_semantic_search()\ngenerate_rag_response()"
+
+' Flujo de búsqueda
+rag_utils --> embedding_model : "encode_query()"
+rag_utils --> chromadb : "similarity_search()"
+chromadb --> rag_utils : "relevant_chunks"
+rag_utils --> openrouter : "DeepSeek V3 Analysis"
+openrouter --> rag_utils : "Generated Response"
+
+' Flujo ETL
+etl_processor --> google_drive : "sync_files()"
+google_drive --> pdfs_folder : "download_pdfs()"
+etl_processor --> pdf_processor : "extract_text()"
+pdf_processor --> texts_folder : "save_txt()"
+etl_processor --> embedding_model : "generate_embeddings()"
+embedding_model --> chromadb : "store_vectors()"
+
+' Flujo de consulta usuario
+chat_ui --> api_client : "user_query"
+api_views --> rag_utils : "search_documents()"
+rag_utils --> api_views : "response + sources"
+api_views --> chat_ui : "formatted_response"
+
+' Flujo de upload
+upload_comp --> api_views : "upload_pdf()"
+api_views --> etl_processor : "process_new_pdf()"
+
+note right of deepseek_model
+  Modelo principal para análisis
+  - Temperature: 0.3
+  - Max tokens: 2000
+  - Análisis académico contextual
+end note
+
+note right of embedding_model
+  Modelo de embeddings optimizado
+  - 768 dimensiones
+  - Multilenguaje
+  - Alta precisión semántica
+end note
+
+note right of chromadb
+  Base de datos vectorial
+  - Búsqueda por similitud
+  - Metadata preservada
+  - Chunks de 800 tokens
+  - Overlap de 100 tokens
+end note
+
+@enduml

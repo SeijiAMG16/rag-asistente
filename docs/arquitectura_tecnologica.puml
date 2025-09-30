@@ -1,0 +1,132 @@
+@startuml Arquitectura_Tecnologica
+!theme carbon-gray
+
+title Stack Tecnológico Completo - RAG Asistente
+
+package "Frontend Layer" {
+    [React 18] as react
+    [JavaScript ES6+] as js
+    [Axios HTTP Client] as axios
+    [CSS Modules] as css
+    [Node.js 16+] as node
+}
+
+package "Backend Layer" {
+    [Django 4.2] as django
+    [Python 3.8+] as python
+    [Django REST Framework] as drf
+    [CORS Headers] as cors
+}
+
+package "AI/ML Stack" {
+    [Sentence Transformers] as st
+    [all-mpnet-base-v2] as mpnet
+    [PyTorch] as pytorch
+    [Transformers Library] as transformers
+    [DeepSeek V3] as deepseek
+}
+
+package "Vector Database" {
+    [ChromaDB] as chromadb
+    [SQLite Backend] as sqlite
+    [HNSW Index] as hnsw
+    [Embeddings 768D] as embeddings
+}
+
+package "Document Processing" {
+    [pdfplumber] as pdfplumber
+    [PyPDF2] as pypdf2
+    [Text Processing] as textproc
+    [Regex Patterns] as regex
+}
+
+package "External APIs" {
+    [OpenRouter API] as openrouter
+    [Google Drive API] as gdrive
+    [Google OAuth 2.0] as oauth
+}
+
+package "Infrastructure" {
+    [Windows PowerShell] as powershell
+    [Batch Scripts] as batch
+    [Virtual Environment] as venv
+    [pip Package Manager] as pip
+}
+
+' Relaciones Frontend
+react --> axios : HTTP Requests
+react --> css : Styling
+node --> react : Runtime Environment
+js --> react : Language
+
+' Relaciones Backend
+django --> drf : REST API
+django --> cors : Cross-Origin
+python --> django : Runtime
+drf --> django : Framework Extension
+
+' Relaciones AI/ML
+st --> mpnet : Embedding Model
+mpnet --> pytorch : Deep Learning Framework
+pytorch --> transformers : NLP Library
+deepseek --> openrouter : API Integration
+transformers --> pytorch : Base Framework
+
+' Relaciones Vector DB
+chromadb --> sqlite : Persistence
+chromadb --> hnsw : Search Index
+embeddings --> chromadb : Storage
+hnsw --> embeddings : Vector Search
+
+' Relaciones Document Processing
+pdfplumber --> textproc : Text Extraction
+pypdf2 --> textproc : Alternative Extraction
+regex --> textproc : Text Cleaning
+textproc --> embeddings : Processed Text
+
+' Relaciones APIs Externas
+openrouter --> deepseek : Model Access
+gdrive --> oauth : Authentication
+oauth --> gdrive : Secure Access
+
+' Relaciones Infrastructure
+powershell --> batch : Script Automation
+venv --> python : Isolated Environment
+pip --> python : Package Management
+
+' Conexiones entre capas
+axios --> drf : API Calls
+django --> st : ML Integration
+chromadb --> django : Data Persistence
+pdfplumber --> django : Document Processing
+openrouter --> django : LLM Integration
+gdrive --> django : File Sync
+
+note right of deepseek
+**DeepSeek V3 Specifications:**
+- 671B parameters
+- Context: 128K tokens
+- Multimodal capabilities
+- Academic analysis optimized
+- Temperature: 0.3 for consistency
+end note
+
+note right of mpnet
+**all-mpnet-base-v2 Specifications:**
+- 768 embedding dimensions
+- Multilingual support
+- Sentence-level semantics
+- Fine-tuned on 1B+ pairs
+- Cosine similarity optimized
+end note
+
+note right of chromadb
+**ChromaDB Configuration:**
+- Persistent storage
+- HNSW indexing algorithm
+- SQLite metadata backend
+- Efficient similarity search
+- Batch operations support
+end note
+
+@enduml

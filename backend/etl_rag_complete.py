@@ -36,8 +36,10 @@ class RAGETLProcessor:
     """Procesador ETL completo para el sistema RAG"""
     
     def __init__(self, project_root: Path = None):
-        self.project_root = project_root or Path(__file__).parent.parent
-        self.data_dir = self.project_root / "data"
+        # Cambiar para usar backend como base, no project_root
+        self.backend_root = Path(__file__).parent
+        self.project_root = self.backend_root.parent
+        self.data_dir = self.backend_root / "data"  # Usar backend/data/
         self.pdfs_dir = self.data_dir / "pdfs"
         self.texts_dir = self.data_dir / "texts"
         self.chroma_dir = self.project_root / "chroma_db_simple"

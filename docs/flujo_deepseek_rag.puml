@@ -1,0 +1,141 @@
+@startuml Flujo_DeepSeek_RAG
+!theme spacelab
+
+title Proceso RAG con DeepSeek V3 - Análisis Académico Contextual
+
+actor "Estudiante" as student
+participant "Frontend React" as frontend
+participant "Django API" as api
+participant "RAG Utils" as rag_utils
+participant "ChromaDB" as chromadb
+participant "Embedding Model\n(all-mpnet-base-v2)" as embed_model
+participant "OpenRouter API" as openrouter
+participant "DeepSeek V3" as deepseek
+
+== Fase 1: Consulta del Usuario ==
+
+student -> frontend : "¿Cuál es la perspectiva de Arias (2020)\nsobre la democracia peruana?"
+activate frontend
+
+frontend -> api : POST /api/chat/simple
+activate api
+note right : Headers:\n- Content-Type: application/json\n- Authorization: Bearer token
+
+api -> api : extract_question_from_request()
+note right : Validaciones:\n- question no vacía\n- top_k válido (default 5)\n- conversation_id opcional
+
+== Fase 2: Búsqueda Semántica ==
+
+api -> rag_utils : perform_semantic_search(query, top_k=5)
+activate rag_utils
+
+rag_utils -> embed_model : encode_query()
+activate embed_model
+
+embed_model -> embed_model : tokenize_question()
+note right : Tokenización:\n- Vocabulary de 30,000 tokens\n- Subword tokenization\n- Truncación a 512 tokens max
+
+embed_model -> embed_model : transformer_forward_pass()
+note right : Transformer layers:\n- 12 layers\n- 768 hidden dimensions\n- Multi-head attention\n- Layer normalization
+
+embed_model -> embed_model : mean_pooling_output()
+embed_model -> embed_model : normalize_l2_vector()
+
+embed_model --> rag_utils : query_embedding[768]
+deactivate embed_model
+
+rag_utils -> chromadb : similarity_search(query_embedding, top_k=5)
+activate chromadb
+
+chromadb -> chromadb : cosine_similarity_calculation()
+note right : Búsqueda vectorial:\n- HNSW index\n- Similitud coseno\n- Filtrado por threshold
+
+chromadb -> chromadb : rank_by_similarity_score()
+chromadb -> chromadb : retrieve_metadata()
+
+chromadb --> rag_utils : relevant_chunks[]\nwith similarity_scores
+deactivate chromadb
+
+rag_utils --> api : search_results[]
+deactivate rag_utils
+
+== Fase 3: Generación con DeepSeek V3 ==
+
+api -> rag_utils : generate_rag_response(question, search_results)
+activate rag_utils
+
+rag_utils -> rag_utils : check_openrouter_api_key()
+note right : Variables de entorno:\n- OPENROUTER_API_KEY\n- Fallback disponible
+
+rag_utils -> rag_utils : prepare_context_chunks()
+note right : Formateo de contexto:\n[FUENTE 1: documento.pdf]\nTexto del chunk...\n\n[FUENTE 2: otro.pdf]\nOtro texto...
+
+rag_utils -> rag_utils : build_academic_prompt()
+note right : Prompt estructurado:\n- Rol: Asistente académico\n- Contexto: Documentos específicos\n- Pregunta: Del estudiante\n- Instrucciones: Análisis detallado
+
+rag_utils -> openrouter : POST /api/v1/chat/completions
+activate openrouter
+
+note right : Request payload:\n{\n  "model": "deepseek/deepseek-v3",\n  "messages": [{"role": "user", "content": prompt}],\n  "temperature": 0.3,\n  "max_tokens": 2000\n}
+
+openrouter -> deepseek : process_academic_analysis()
+activate deepseek
+
+deepseek -> deepseek : understand_context()
+note right : DeepSeek V3 análisis:\n- Comprensión contextual\n- Identificación de autores\n- Análisis temporal\n- Síntesis académica
+
+deepseek -> deepseek : generate_detailed_response()
+note right : Generación:\n- Citas específicas\n- Referencias directas\n- Tono académico\n- Estructura coherente
+
+deepseek --> openrouter : academic_response
+deactivate deepseek
+
+openrouter --> rag_utils : API_response_with_content
+deactivate openrouter
+
+rag_utils -> rag_utils : validate_response_quality()
+note right : Validaciones:\n- Longitud mínima\n- Contenido relevante\n- Formato correcto
+
+rag_utils -> rag_utils : structure_response_with_sources()
+note right : Estructura final:\n{\n  "respuesta": "...",\n  "fuentes": [...],\n  "total_fuentes": 5\n}
+
+rag_utils --> api : structured_response
+deactivate rag_utils
+
+== Fase 4: Respuesta al Usuario ==
+
+api -> api : save_conversation_history()
+note right : Base de datos:\n- Message(user): pregunta\n- Message(bot): respuesta\n- Conversation: metadata
+
+api -> api : format_final_response()
+note right : Response format:\n{\n  "answer": "análisis completo",\n  "sources": [...],\n  "conversation_id": 123,\n  "latency_ms": 2500\n}
+
+api --> frontend : JSON response
+deactivate api
+
+frontend -> frontend : render_response_with_sources()
+note right : UI Components:\n- Respuesta formateada\n- Lista de fuentes\n- Links a documentos\n- Scores de similitud
+
+frontend --> student : Respuesta académica completa\ncon fuentes citadas
+deactivate frontend
+
+== Resultado Final ==
+
+note over student, deepseek
+**RESPUESTA EJEMPLO:**
+
+Según el análisis de los documentos proporcionados, Arias (2020) presenta una perspectiva crítica sobre la democracia peruana, enfocándose en tres aspectos fundamentales:
+
+1. **Crisis de representatividad**: El autor señala que existe una desconexión significativa entre las instituciones democráticas formales y las expectativas ciudadanas...
+
+2. **Fragmentación política**: Arias destaca cómo la fragmentación del sistema de partidos ha debilitado la gobernabilidad democrática...
+
+3. **Desafíos estructurales**: El documento enfatiza los problemas históricos que persisten en el sistema democrático peruano...
+
+**Fuentes consultadas:**
+- [1] Arias_2020_Democracia_Peruana.pdf (Similitud: 0.89)
+- [2] Analisis_Politico_Peru_2020.pdf (Similitud: 0.76)
+- [3] Sistema_Democratico_Contemporaneo.pdf (Similitud: 0.71)
+end note
+
+@enduml

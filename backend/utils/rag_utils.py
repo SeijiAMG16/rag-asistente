@@ -184,7 +184,7 @@ def perform_semantic_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
 
 def generate_rag_response(query: str, search_results: List[Dict[str, Any]]) -> str:
     """
-    Genera respuesta RAG usando modelos LLM potentes (DeepSeek V3, Groq, Together AI, etc).
+    Genera respuesta RAG usando modelos LLM potentes (DeepSeek V3).
     ANÁLISIS REAL y CONTEXTUAL - NO respuestas predeterminadas.
     Incluye fuentes y referencias específicas.
     
