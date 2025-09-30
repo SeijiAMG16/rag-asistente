@@ -1,3 +1,4 @@
+# === DEPENDENCIAS CORE DJANGO ===
 Django>=5.0
 djangorestframework>=3.15
 djangorestframework-simplejwt>=5.3
@@ -5,24 +6,50 @@ drf-spectacular>=0.27
 django-cors-headers>=4.3
 django-environ>=0.11
 python-dotenv>=1.0
+
+# === BASE DE DATOS ===
 mysqlclient>=2.2
 mysql-connector-python>=8.0
+
+# === SISTEMA RAG CORE ===
 chromadb>=0.5
 sentence-transformers>=2.2
 python-json-logger>=2.0
+
+# === PROCESAMIENTO DE DOCUMENTOS ===
 PyPDF2>=3.0
+pdfplumber>=0.11.0
+pymupdf>=1.24.0
 python-docx>=1.1
 tqdm>=4.66
 
-# === MODELOS LLM POTENTES PARA ANÁLISIS AVANZADO ===
-# Groq API (Llama 3.3 70B - PRINCIPAL, YA TIENES API KEY)
+# === MODELOS LLM POTENTES (NUEVOS) ===
+# Groq API (Llama 3.3 70B - MUY RÁPIDO Y GRATUITO)
 groq>=0.31.0
 
-# Together AI (DeepSeek V3, Qwen2.5 - OPCIONAL)
+# Together AI (DeepSeek V3, Qwen2.5 - MUY POTENTE Y BARATO)
 together>=1.3.0
+
+# Cohere (Command R+, Embeddings - EXCELENTE Y GRATUITO)
+cohere>=5.11.0
+
+# OpenAI (GPT-4, Embeddings - BACKUP CONFIABLE)
+openai>=1.54.0
 
 # Google Gemini (Análisis superior - OPCIONAL)  
 google-generativeai>=0.8.0
 
-# OpenAI (Backup confiable - OPCIONAL)
-openai>=1.54.0
+# === DEPENDENCIAS DE EMBEDDINGS MEJORADOS ===
+# Hugging Face (Embeddings gratuitos)
+huggingface-hub>=0.25.0
+transformers>=4.45.0
+
+# === DEPENDENCIAS DE ANÁLISIS ===
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+torch>=2.0.0
+
+# === DEPENDENCIAS ADICIONALES ===
+requests>=2.31.0
+Pillow>=10.0.0

@@ -13,9 +13,9 @@ from .models import Conversation, Message
 # Configura el logger para registrar eventos importantes del sistema
 logger = logging.getLogger(__name__)
 
-# Importar sistema RAG simplificado
+# Importar sistema RAG optimizado
 try:
-    from utils.simple_rag_integration import query_rag_simple, get_rag_stats_simple
+    from utils.rag_utils import perform_semantic_search, get_project_root
     RAG_SYSTEM_AVAILABLE = True
 except ImportError as e:
     logging.warning(f"Sistema RAG no disponible: {e}")
@@ -216,7 +216,7 @@ def query_view(request):
             "total_fuentes": len(sources),
             "top_k_requested": top_k,
             "chroma_db_used": True,
-            "llm_provider": "groq",
+            "llm_provider": "deepseek",
             "respuesta_con_fuentes": isinstance(rag_response, dict),
             "caracteres_respuesta": len(answer),
         },
@@ -636,8 +636,41 @@ def chat_simple(request):
         if not user_input:
             return Response({'error': 'Mensaje vacío'}, status=400)
         
-        # Consultar sistema RAG simplificado
-        rag_response = query_rag_simple(user_input)
+        # Consultar sistema RAG optimizado
+        try:
+            # Usar nueva función de búsqueda semántica
+            search_results = perform_semantic_search(user_input, top_k=5)
+            
+            # Formatear respuesta
+            if search_results:
+                # Si es un string (respuesta de DeepSeek), devolverlo directamente
+                if isinstance(search_results, str):
+                    rag_response = {
+                        'respuesta': search_results,
+                        'fuentes': [],
+                        'total_fuentes': 0
+                    }
+                # Si es una lista (búsqueda básica), generar respuesta
+                elif isinstance(search_results, list):
+                    rag_response = {
+                        'respuesta': f"Encontré {len(search_results)} resultados relevantes para tu consulta.",
+                        'fuentes': search_results[:3],  # Top 3 resultados
+                        'total_fuentes': len(search_results)
+                    }
+                else:
+                    rag_response = search_results  # Ya es un dict estructurado
+            else:
+                rag_response = {
+                    'respuesta': 'No encontré información relevante para tu consulta.',
+                    'fuentes': [],
+                    'total_fuentes': 0
+                }
+                
+        except Exception as e:
+            logger.error(f"Error en búsqueda RAG: {e}")
+            rag_response = {
+                'error': f'Error en sistema RAG: {str(e)}'
+            }
         
         if rag_response.get('error'):
             return Response({
@@ -680,7 +713,51 @@ def rag_status_simple(request):
                 'error': 'Sistema RAG no disponible'
             })
         
-        stats = get_rag_stats_simple()
+        # Obtener estadísticas del sistema RAG optimizado
+        try:
+            import chromadb
+            from pathlib import Path
+            
+            # Obtener stats de la base de datos optimizada
+            project_root = get_project_root()
+            chroma_path = project_root / "chroma_db_simple"
+            
+            if chroma_path.exists():
+                client = chromadb.PersistentClient(path=str(chroma_path))
+                collections = client.list_collections()
+                
+                if collections:
+                    collection = collections[0]  # Primera colección
+                    count = collection.count()
+                    
+                    stats = {
+                        'status': 'active',
+                        'total_documents': count,
+                        'database_path': str(chroma_path),
+                        'system_type': 'optimized_rag',
+                        'embedding_model': 'all-mpnet-base-v2',
+                        'features': ['hybrid_search', 'bm25', 'reranking']
+                    }
+                else:
+                    stats = {
+                        'status': 'no_collections',
+                        'total_documents': 0,
+                        'system_type': 'optimized_rag'
+                    }
+            else:
+                stats = {
+                    'status': 'no_database',
+                    'total_documents': 0,
+                    'system_type': 'optimized_rag'
+                }
+                
+        except Exception as e:
+            logger.error(f"Error obteniendo estadísticas: {e}")
+            stats = {
+                'status': 'error',
+                'error': str(e),
+                'system_type': 'optimized_rag'
+            }
         return Response(stats)
         
     except Exception as e:

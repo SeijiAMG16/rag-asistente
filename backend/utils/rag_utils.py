@@ -59,41 +59,82 @@ def initialize_rag_components():
         from sentence_transformers import SentenceTransformer
         import chromadb
 
-        # Paths del proyecto - usar chroma_db_simple donde están los documentos
-        PROJECT_ROOT = get_project_root()
-        CHROMA_DIR = os.environ.get("CHROMA_DIR") or os.path.join(PROJECT_ROOT, "chroma_db_simple")
+        # Usar ruta relativa que sabemos que funciona
+        current_dir = Path(__file__).parent
+        chroma_path = current_dir.parent.parent / "chroma_db_simple"
+        
+        # Modelo de embeddings mejorado (mismo que la base avanzada)
+        model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
-        # Modelo de embeddings (el mismo usado en simple_rag_system.py)
-        model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-
-        # Cliente ChromaDB persistente
-        client = chromadb.PersistentClient(path=CHROMA_DIR)
-        # Conectar a la colección con 699 documentos
-        try:
-            collection = client.get_collection("simple_rag_docs")
-            logger.info(f"Conectado a colección 'simple_rag_docs' con {collection.count()} documentos")
-        except Exception:
-            logger.warning("Colección 'simple_rag_docs' no encontrada, intentando crear...")
-            from chromadb.utils import embedding_functions
-            embedding_function = embedding_functions.SentenceTransformerEmbeddingFunction(
-                model_name="sentence-transformers/all-MiniLM-L6-v2"
-            )
-            collection = client.create_collection(
-                name="simple_rag_docs",
-                embedding_function=embedding_function
-            )
-
-        logger.info(f"RAG components initialized successfully. ChromaDB path: {CHROMA_DIR}")
+        # Cliente ChromaDB con ruta que funciona
+        client = chromadb.PersistentClient(path=str(chroma_path))
+        collection = client.get_collection("simple_rag_docs")
+        
+        count = collection.count()
+        logger.info(f"RAG components initialized. ChromaDB: {chroma_path}, Docs: {count}")
+        
         return model, client, collection
 
     except Exception as e:
         logger.error(f"Error initializing RAG components: {str(e)}")
         raise
+        raise
 
 def perform_semantic_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
     """
     busca los fragmentos más relevantes en la base vectorial 
+    
+    NUEVO: Sistema RAG optimizado con búsqueda híbrida y reranking
     """
+    
+    # Priorizar sistema optimizado si está disponible
+    use_optimized = os.getenv("USE_OPTIMIZED_RAG", "true").lower() == "true"
+    
+    if use_optimized:
+        try:
+            from .optimized_rag_system import perform_optimized_search
+            logger.info("🚀 Usando sistema RAG optimizado (híbrido + reranking)")
+            return perform_optimized_search(query, top_k)
+        except ImportError as e:
+            logger.warning(f"⚠️ Sistema optimizado no disponible: {e}")
+        except Exception as e:
+            logger.error(f"❌ Error en sistema optimizado: {e}, fallback a sistema clásico")
+    
+    # Fallback al sistema mejorado
+    use_enhanced = (
+        os.getenv("USE_ENHANCED_RAG", "false").lower() == "true" or
+        os.getenv("GROQ_API_KEY") or 
+        os.getenv("TOGETHER_API_KEY") or
+        os.getenv("OPENROUTER_API_KEY") or
+        os.getenv("COHERE_API_KEY")
+    )
+    
+    if use_enhanced:
+        try:
+            # Usar sistema RAG optimizado directamente
+            from .optimized_rag_system import OptimizedRAGSystem
+            logger.info("🚀 Usando sistema RAG optimizado (híbrido + reranking)")
+            
+            optimized_system = OptimizedRAGSystem()
+            results = optimized_system.advanced_search(query, top_k=top_k)
+            
+            # Convertir formato para compatibilidad
+            formatted_results = []
+            for result in results:
+                formatted_results.append({
+                    'texto': result['content'],
+                    'archivo': result['source'],
+                    'chunk': result.get('chunk_id', 'N/A'),
+                    'similarity_score': result['score']
+                })
+            
+            return formatted_results
+            
+        except ImportError:
+            logger.warning("⚠️ Sistema optimizado no disponible, usando búsqueda clásica")
+        except Exception as e:
+            logger.error(f"❌ Error en sistema optimizado: {e}, fallback a búsqueda clásica")
+    
     try:
         model, client, collection = initialize_rag_components()
 
@@ -143,18 +184,88 @@ def perform_semantic_search(query: str, top_k: int = 5) -> List[Dict[str, Any]]:
 
 def generate_rag_response(query: str, search_results: List[Dict[str, Any]]) -> str:
     """
-    Genera respuesta RAG usando modelos LLM potentes (Groq, Together AI, Gemini, OpenAI).
+    Genera respuesta RAG usando modelos LLM potentes (DeepSeek V3, Groq, Together AI, etc).
     ANÁLISIS REAL y CONTEXTUAL - NO respuestas predeterminadas.
     Incluye fuentes y referencias específicas.
+    
+    PRIORIDAD: DeepSeek V3 via OpenRouter
     """
     if not search_results:
         return _generate_no_results_response(query)
 
+    # PRIMERA PRIORIDAD: DeepSeek V3 via OpenRouter
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
+    if openrouter_key:
+        try:
+            import requests
+            import json
+            
+            # Preparar chunks para DeepSeek
+            context_chunks = []
+            for i, result in enumerate(search_results[:5], 1):
+                chunk = f"[FUENTE {i}: {result['archivo']}]\n{result['texto']}"
+                context_chunks.append(chunk)
+            
+            logger.info("🤖 Usando DeepSeek V3 para análisis académico")
+            
+            # Llamada directa a OpenRouter API con DeepSeek
+            context_text = "\n\n".join(context_chunks)
+            
+            prompt = f"""Eres un asistente académico especializado en análisis de textos universitarios. 
+Tu tarea es proporcionar respuestas precisas, detalladas y bien fundamentadas basándote en los documentos proporcionados.
+
+CONTEXTO ACADÉMICO:
+{context_text}
+
+PREGUNTA DEL ESTUDIANTE:
+{query}
+
+INSTRUCCIONES:
+- Proporciona una respuesta académica completa y detallada
+- Cita específicamente los autores y años cuando sea relevante
+- Incluye referencias directas a los textos
+- Mantén un tono académico y profesional
+- Si la información no está en el contexto, indícalo claramente
+
+RESPUESTA:"""
+
+            headers = {
+                "Authorization": f"Bearer {openrouter_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "http://localhost:8000",
+                "X-Title": "RAG Academic Assistant"
+            }
+            
+            data = {
+                "model": "deepseek/deepseek-v3",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3,
+                "max_tokens": 2000
+            }
+            
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=data,
+                timeout=60
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if 'choices' in result and len(result['choices']) > 0:
+                    deepseek_response = result['choices'][0]['message']['content']
+                    logger.info(f"✅ DeepSeek V3 respuesta exitosa: {len(deepseek_response)} caracteres")
+                    return deepseek_response
+                
+        except Exception as e:
+            logger.error(f"❌ Error con DeepSeek: {e}, fallback a sistema básico")
+
+    # FALLBACK: Sistema básico con contexto estructurado
     try:
-        # Usar sistema avanzado de análisis con modelos LLM potentes
-        from .advanced_rag_analyzer import generate_intelligent_response
-        
-        # Preparar contexto de los mejores resultados
+        # Preparar contexto de los mejores resultados sin análisis LLM externo
         context_chunks = []
         sources_info = []
         
@@ -172,10 +283,10 @@ def generate_rag_response(query: str, search_results: List[Dict[str, Any]]) -> s
                 "texto_preview": result['texto'][:200] + "..." if len(result['texto']) > 200 else result['texto']
             })
         
-        logger.info(f"Generando respuesta inteligente para: '{query[:50]}...' con {len(context_chunks)} chunks")
+        logger.info(f"Generando respuesta básica estructurada para: '{query[:50]}...' con {len(context_chunks)} chunks")
         
-        # Generar respuesta con análisis LLM avanzado
-        response = generate_intelligent_response(query, context_chunks)
+        # Generar respuesta básica estructurada (sin LLM externo)
+        response = _generate_advanced_fallback_response(query, search_results)
         
         if response and len(response.strip()) > 50:  # Verificar que sea una respuesta sustantiva
             # Estructurar respuesta con fuentes
@@ -186,14 +297,14 @@ def generate_rag_response(query: str, search_results: List[Dict[str, Any]]) -> s
                 "query_procesada": query
             }
             
-            logger.info(f"✅ Respuesta LLM generada: {len(response)} caracteres con {len(sources_info)} fuentes")
+            logger.info(f"✅ Respuesta básica generada: {len(response)} caracteres con {len(sources_info)} fuentes")
             return structured_response
         else:
-            logger.warning("⚠️ Respuesta LLM insuficiente, usando fallback")
+            logger.warning("⚠️ Respuesta básica insuficiente, usando fallback")
             return _generate_advanced_fallback_response_with_sources(query, search_results)
         
-    except ImportError as e:
-        logger.error(f"❌ No se pudo importar sistema LLM: {e}")
+    except Exception as e:
+        logger.error(f"❌ Error en sistema básico: {e}")
         return _generate_advanced_fallback_response_with_sources(query, search_results)
     except Exception as e:
         logger.error(f"❌ Error en análisis LLM: {str(e)}")
