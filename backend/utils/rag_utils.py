@@ -240,7 +240,7 @@ RESPUESTA:"""
             }
             
             data = {
-                "model": "deepseek/deepseek-v3",
+                "model": "deepseek/deepseek-chat-v3.1",
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.3,
                 "max_tokens": 2000

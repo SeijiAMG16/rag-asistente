@@ -26,11 +26,33 @@ import pickle
 from functools import lru_cache
 import threading
 
-# Imports especializados
-import numpy as np
-from sentence_transformers import SentenceTransformer, CrossEncoder
-import chromadb
-from rank_bm25 import BM25Okapi
+# Imports especializados con manejo de errores
+try:
+    import numpy as np
+except ImportError:
+    print("❌ NumPy no disponible. Instalar con: pip install numpy")
+    raise
+
+try:
+    from sentence_transformers import SentenceTransformer, CrossEncoder
+except ImportError:
+    print("❌ SentenceTransformers no disponible. Instalar con: pip install sentence-transformers")
+    raise
+
+try:
+    import chromadb
+except ImportError:
+    print("❌ ChromaDB no disponible. Instalar con: pip install chromadb")
+    raise
+
+try:
+    from rank_bm25 import BM25Okapi
+    HAS_BM25 = True
+except ImportError:
+    print("⚠️ rank-bm25 no disponible. Funciones BM25 deshabilitadas. Instalar con: pip install rank-bm25")
+    BM25Okapi = None
+    HAS_BM25 = False
+
 import re
 from collections import defaultdict
 
@@ -109,6 +131,11 @@ class OptimizedRAGSystem:
     
     def _build_bm25_index(self):
         """Construir índice BM25 para búsqueda híbrida"""
+        if not HAS_BM25:
+            logger.warning("⚠️ BM25 no disponible - funcionalidad híbrida deshabilitada")
+            self.bm25_index = None
+            return
+            
         logger.info("🔧 Construyendo índice BM25...")
         
         # Obtener todos los documentos
@@ -201,7 +228,8 @@ class OptimizedRAGSystem:
         """Búsqueda BM25 (léxica) para complementar búsqueda semántica"""
         self._initialize_models()  # Asegurar que esté inicializado
         
-        if not self.bm25_index:
+        if not HAS_BM25 or not self.bm25_index:
+            logger.warning("⚠️ BM25 no disponible - usando solo búsqueda semántica")
             return []
         
         cache_key = self._get_cache_key(query, "bm25")

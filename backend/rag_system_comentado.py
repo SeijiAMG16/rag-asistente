@@ -342,7 +342,7 @@ RESPUESTA:"""
             # === PARÁMETROS DEL MODELO ===
             # Configuración optimizada para análisis académico
             data = {
-                "model": "deepseek/deepseek-v3",    # Modelo específico
+                "model": "deepseek/deepseek-chat-v3.1",    # Modelo específico
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.3,    # Baja temperatura para consistencia
                 "max_tokens": 2000,    # Suficiente para análisis detallado
