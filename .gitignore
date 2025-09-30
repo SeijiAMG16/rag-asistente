@@ -59,3 +59,5 @@ export.json
 
 # Lock de dependencias (opcional)
 yarn.lock
+
+backend/data/
